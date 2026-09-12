@@ -1,5 +1,6 @@
 'use client';
 
+import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -8,6 +9,7 @@ import {
 } from 'recharts';
 
 export default function DispatchPage() {
+  const { currency, powerScale } = useSettings();
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function DispatchPage() {
 
       <Card className="bg-slate-900 border-slate-800">
         <CardHeader>
-          <CardTitle>Real-Time Power Mix (kW)</CardTitle>
+          <CardTitle>Real-Time Power Mix ({powerScale})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[400px] w-full mt-4">
@@ -99,7 +101,7 @@ export default function DispatchPage() {
                      {row.batteryDischarge > 0 && <span className="px-2 py-1 bg-indigo-500/20 text-indigo-500 text-xs rounded border border-indigo-500/30">Battery</span>}
                      {row.diesel > 0 && <span className="px-2 py-1 bg-red-500/20 text-red-500 text-xs rounded border border-red-500/30">Diesel</span>}
                    </div>
-                   <div className="text-sm text-emerald-400 font-mono">{row.demand} kW</div>
+                   <div className="text-sm text-emerald-400 font-mono">{row.demand} {powerScale}</div>
                  </div>
                ))}
             </div>

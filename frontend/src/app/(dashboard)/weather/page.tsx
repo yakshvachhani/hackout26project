@@ -1,5 +1,6 @@
 'use client';
 
+import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CloudRain, Sun, Wind, MapPin } from 'lucide-react';
@@ -8,6 +9,7 @@ import {
 } from 'recharts';
 
 export default function WeatherPage() {
+  const { currency, powerScale } = useSettings();
   const [forecast, setForecast] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -65,19 +67,19 @@ export default function WeatherPage() {
             {error ? "Using simulated fallback data." : "Live 48-hour forecasting using Open-Meteo API data."}
           </p>
         </div>
-        <div className="flex items-center gap-2 bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg text-sm">
+        <div className="flex items-center gap-2 bg-[#0f172a] border border-slate-800/50 px-4 py-2 rounded-xl text-sm">
           <MapPin size={16} className="text-slate-400" />
           <span className="font-medium">Kutch, Gujarat (23.73° N, 69.85° E)</span>
         </div>
       </div>
 
       {loading ? (
-        <div className="h-[250px] w-full flex items-center justify-center text-slate-500 animate-pulse">
+        <div className="h-[250px] w-full flex items-center justify-center text-white0 animate-pulse">
           Fetching live weather data from API...
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card className="bg-slate-900 border-slate-800">
+          <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><Sun size={18} className="text-yellow-500"/> Solar Radiation Forecast (W/m²)</CardTitle>
             </CardHeader>
@@ -97,7 +99,7 @@ export default function WeatherPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800">
+          <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2"><Wind size={18} className="text-blue-500"/> Wind Speed Forecast (km/h)</CardTitle>
             </CardHeader>
@@ -118,7 +120,7 @@ export default function WeatherPage() {
         </div>
       )}
 
-      <Card className="bg-slate-900 border-slate-800 border-l-4 border-l-yellow-500">
+      <Card className="bg-[#0f172a] border-slate-800/50 border-l-4 border-l-yellow-500">
         <CardHeader>
           <CardTitle className="text-lg">Intelligent Weather Risk Alert</CardTitle>
         </CardHeader>
@@ -127,8 +129,8 @@ export default function WeatherPage() {
             <span className="font-bold text-yellow-500">⚠ Renewable generation risk detected: </span>
             Based on the live forecast, solar output may decline tomorrow afternoon due to expected cloud cover.
           </p>
-          <div className="mt-4 p-3 bg-slate-800 rounded border border-slate-700">
-            <span className="text-emerald-400 font-bold">Recommended action:</span> Trigger battery charging cycle before 14:00 today using available surplus.
+          <div className="mt-4 p-3 bg-[#1e293b]/50 rounded border border-slate-700">
+            <span className="text-emerald-500 font-bold">Recommended action:</span> Trigger battery charging cycle before 14:00 today using available surplus.
           </div>
         </CardContent>
       </Card>

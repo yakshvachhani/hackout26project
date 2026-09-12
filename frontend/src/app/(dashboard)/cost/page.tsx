@@ -1,13 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '@/contexts/SettingsContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CircleDollarSign, CloudRain, Droplet, Battery, TrendingDown, Leaf } from 'lucide-react';
 import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area, Cell
 } from 'recharts';
 
 export default function CostPage() {
+  const { currency, powerScale } = useSettings();
   const [weeklyData, setWeeklyData] = useState<any[]>([]);
   
   useEffect(() => {
@@ -40,51 +42,51 @@ export default function CostPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">Today's Operating Cost</CardTitle>
             <CircleDollarSign className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">₹{todaysCost.toLocaleString()}</div>
+            <div className="text-2xl font-bold text-white">{currency}{todaysCost.toLocaleString()}</div>
             <p className="text-xs text-emerald-500 flex items-center mt-1">
               <TrendingDown size={14} className="mr-1" /> {savingsPercent}% vs Diesel Baseline
             </p>
           </CardContent>
         </Card>
         
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">7-Day Emissions Avoided</CardTitle>
             <CloudRain className="h-4 w-4 text-blue-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">{totalCO2} kg CO₂</div>
-            <p className="text-xs text-slate-500 mt-1">Total over last 7 days</p>
+            <div className="text-2xl font-bold text-white">{totalCO2} kg CO₂</div>
+            <p className="text-xs text-white0 mt-1">Total over last 7 days</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">Diesel Consumption</CardTitle>
             <Droplet className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">52 L</div>
+            <div className="text-2xl font-bold text-white">52 L</div>
             <p className="text-xs text-emerald-500 flex items-center mt-1">
               <TrendingDown size={14} className="mr-1" /> -39 L vs Yesterday
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">7-Day Savings</CardTitle>
             <Leaf className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">₹{Number(totalSavings).toLocaleString()}</div>
-            <p className="text-xs text-slate-500 mt-1">Cumulative cost reduction</p>
+            <div className="text-2xl font-bold text-white">{currency}{Number(totalSavings).toLocaleString()}</div>
+            <p className="text-xs text-white0 mt-1">Cumulative cost reduction</p>
           </CardContent>
         </Card>
       </div>
@@ -92,9 +94,9 @@ export default function CostPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Cost Comparison Chart */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50">
           <CardHeader>
-            <CardTitle>Optimized vs Diesel-Only Baseline Cost (₹)</CardTitle>
+            <CardTitle>Optimized vs Diesel-Only Baseline Cost ({currency})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full">
@@ -102,8 +104,8 @@ export default function CostPage() {
                 <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
                   <XAxis dataKey="day" stroke="#94a3b8" />
-                  <YAxis stroke="#94a3b8" />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }} />
+                  <YAxis stroke="#94a3b8" tickFormatter={(val) => `${currency}${val}`} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }} formatter={(val: any) => `${currency}${val}`} />
                   <Legend />
                   <Bar dataKey="dieselOnlyCost" fill="#334155" name="Diesel-Only Baseline" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="optimizedCost" fill="#10b981" name="Optimized Microgrid" radius={[4, 4, 0, 0]} />
@@ -114,7 +116,7 @@ export default function CostPage() {
         </Card>
 
         {/* CO2 Emissions Chart */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50">
           <CardHeader>
             <CardTitle>CO₂ Emissions Avoided (kg)</CardTitle>
           </CardHeader>
@@ -141,7 +143,7 @@ export default function CostPage() {
         </Card>
 
         {/* Cost Breakdown */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50">
           <CardHeader>
             <CardTitle>Today's Cost Breakdown</CardTitle>
           </CardHeader>
@@ -150,13 +152,13 @@ export default function CostPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={costBreakdown} layout="vertical" margin={{ top: 10, right: 30, left: 40, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
-                  <XAxis type="number" stroke="#94a3b8" />
+                  <XAxis type="number" stroke="#94a3b8" tickFormatter={(val) => `${currency}${val}`} />
                   <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }} cursor={{fill: '#1e293b'}} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }} cursor={{fill: '#1e293b'}} formatter={(val: any) => `${currency}${val}`} />
                   <Bar dataKey="cost" radius={[0, 4, 4, 0]}>
                     {
                       costBreakdown.map((entry, index) => (
-                        <cell key={`cell-${index}`} fill={entry.fill} />
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))
                     }
                   </Bar>

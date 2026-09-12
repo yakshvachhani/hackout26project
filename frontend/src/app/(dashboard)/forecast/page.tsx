@@ -1,11 +1,13 @@
 'use client';
 
+import { useSettings } from '@/contexts/SettingsContext';
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ForecastPage() {
+  const { currency, powerScale } = useSettings();
   return (
     <div className="space-y-6">
       <div>
@@ -14,7 +16,7 @@ export default function ForecastPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-slate-900 border-slate-800 hover:border-blue-500 transition-colors cursor-pointer">
+        <Card className="bg-[#0f172a] border-slate-800/50 hover:border-blue-500 transition-colors cursor-pointer">
           <Link href="/weather">
             <CardHeader>
               <CardTitle className="text-blue-400">Weather & Renewables</CardTitle>
@@ -26,10 +28,10 @@ export default function ForecastPage() {
           </Link>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800 hover:border-emerald-500 transition-colors cursor-pointer">
+        <Card className="bg-[#0f172a] border-slate-800/50 hover:border-emerald-500 transition-colors cursor-pointer">
           <Link href="/demand">
             <CardHeader>
-              <CardTitle className="text-emerald-400">Community Load Demand</CardTitle>
+              <CardTitle className="text-emerald-500">Community Load Demand</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-slate-300 mb-4">View predictive community load profiles, split by residential, commercial, and critical infrastructure.</p>

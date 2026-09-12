@@ -1,5 +1,5 @@
 'use client';
-
+import { useSettings } from '@/contexts/SettingsContext';
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Leaf, Droplet, Zap, Battery, CircleDollarSign, Wind, Sun, CloudRain } from 'lucide-react';
@@ -20,21 +20,21 @@ function EnergyFlowDiagram({ data }: { data: any }) {
       <div className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center">
         <Sun className="text-yellow-400 mb-2" size={32} />
         <div className="bg-slate-800 px-3 py-1 rounded text-sm font-medium border border-slate-700">Solar</div>
-        <div className="text-xs text-yellow-400 mt-1 font-mono">84 kW</div>
+        <div className="text-xs text-yellow-400 mt-1 font-mono">{84 }</div>
       </div>
       
       {/* Wind */}
       <div className="absolute top-1/2 left-8 -translate-y-1/2 flex flex-col items-center">
         <Wind className="text-blue-400 mb-2" size={32} />
         <div className="bg-slate-800 px-3 py-1 rounded text-sm font-medium border border-slate-700">Wind</div>
-        <div className="text-xs text-blue-400 mt-1 font-mono">36 kW</div>
+        <div className="text-xs text-blue-400 mt-1 font-mono">{36 }</div>
       </div>
 
       {/* Battery */}
       <div className="absolute top-1/2 right-8 -translate-y-1/2 flex flex-col items-center">
         <Battery className="text-indigo-400 mb-2" size={32} />
         <div className="bg-slate-800 px-3 py-1 rounded text-sm font-medium border border-slate-700">Battery</div>
-        <div className="text-xs text-indigo-400 mt-1 font-mono">-22 kW</div>
+        <div className="text-xs text-indigo-400 mt-1 font-mono">{-22 }</div>
         <div className="text-[10px] text-slate-400">SOC: 68%</div>
       </div>
 
@@ -42,14 +42,14 @@ function EnergyFlowDiagram({ data }: { data: any }) {
       <div className="absolute bottom-8 left-1/4 -translate-x-1/2 flex flex-col items-center">
         <Droplet className="text-red-400 mb-2" size={32} />
         <div className="bg-slate-800 px-3 py-1 rounded text-sm font-medium border border-slate-700">Diesel</div>
-        <div className="text-xs text-red-400 mt-1 font-mono">18 kW</div>
+        <div className="text-xs text-red-400 mt-1 font-mono">{18 }</div>
       </div>
 
       {/* Load */}
       <div className="absolute bottom-8 right-1/4 translate-x-1/2 flex flex-col items-center">
         <Zap className="text-emerald-400 mb-2" size={32} />
         <div className="bg-slate-800 px-3 py-1 rounded text-sm font-medium border border-slate-700">Load</div>
-        <div className="text-xs text-emerald-400 mt-1 font-mono">116 kW</div>
+        <div className="text-xs text-emerald-400 mt-1 font-mono">{116 }</div>
       </div>
       
       {/* TODO: Add SVG lines connecting them */}
@@ -73,6 +73,7 @@ function KpiCard({ title, value, subValue, icon: Icon, colorClass }: any) {
 }
 
 export default function OverviewPage() {
+  const { currency, powerScale } = useSettings();
   const [data, setData] = useState(null);
 
   useEffect(() => {
@@ -93,9 +94,9 @@ export default function OverviewPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <KpiCard title="Renewable Share" value="74.8%" subValue="Target: 80%" icon={Leaf} colorClass="text-emerald-500" />
         <KpiCard title="Diesel Dependency" value="12.4%" subValue="-2.1% from yesterday" icon={Droplet} colorClass="text-red-500" />
-        <KpiCard title="Current Load" value="116 kW" subValue="Peak: 184 kW" icon={Zap} colorClass="text-yellow-500" />
+        <KpiCard title="Current Load" value={"116 " + powerScale} subValue={"Peak: 184 " + powerScale} icon={Zap} colorClass="text-yellow-500" />
         <KpiCard title="Battery SOC" value="68%" subValue="Charging (340 kWh)" icon={Battery} colorClass="text-indigo-500" />
-        <KpiCard title="Operating Cost" value="₹2,840" subValue="Projected: ₹3,240" icon={CircleDollarSign} colorClass="text-emerald-400" />
+        <KpiCard title="Operating Cost" value={currency + "2,840"} subValue={"Projected: " + currency + "3,240"} icon={CircleDollarSign} colorClass="text-emerald-500" />
         <KpiCard title="Carbon Avoided" value="126 kg" subValue="Equivalent to 5 trees" icon={CloudRain} colorClass="text-blue-400" />
       </div>
 
@@ -117,17 +118,17 @@ export default function OverviewPage() {
             <div className="space-y-4 font-mono text-sm">
               <div className="space-y-2">
                 <div className="text-slate-500 mb-1">GENERATION</div>
-                <div className="flex justify-between text-yellow-400"><span>Solar</span><span>84 kW</span></div>
-                <div className="flex justify-between text-blue-400"><span>Wind</span><span>36 kW</span></div>
-                <div className="flex justify-between text-red-400"><span>Diesel</span><span>18 kW</span></div>
-                <div className="flex justify-between text-indigo-400"><span>Battery</span><span>-22 kW</span></div>
+                <div className="flex justify-between text-yellow-400"><span>Solar</span><span>{84 }</span></div>
+                <div className="flex justify-between text-blue-400"><span>Wind</span><span>{36 }</span></div>
+                <div className="flex justify-between text-red-400"><span>Diesel</span><span>{18 }</span></div>
+                <div className="flex justify-between text-indigo-400"><span>Battery</span><span>{-22 }</span></div>
                 <div className="border-t border-slate-800 pt-2 flex justify-between font-bold text-white mt-2">
-                  <span>Total Gen</span><span>116 kW</span>
+                  <span>Total Gen</span><span>{116 }</span>
                 </div>
               </div>
               <div className="border-t border-slate-800 pt-4 space-y-2">
-                <div className="flex justify-between text-emerald-400 font-bold"><span>Demand</span><span>116 kW</span></div>
-                <div className="flex justify-between text-slate-400"><span>Spinning Reserve</span><span>24 kW</span></div>
+                <div className="flex justify-between text-emerald-400 font-bold"><span>Demand</span><span>{116 }</span></div>
+                <div className="flex justify-between text-slate-400"><span>Spinning Reserve</span><span>{24 }</span></div>
               </div>
             </div>
           </CardContent>

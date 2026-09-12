@@ -1,100 +1,344 @@
 'use client';
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sun, Wind, Battery, Droplet, Activity, AlertCircle } from 'lucide-react';
+import { useSettings } from '@/contexts/SettingsContext';
+import React, { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Sun, Wind, Battery, Droplet, X } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from 'recharts';
+
+const DATA_TODAY = [
+  { time: '00:00', value: 0 }, { time: '02:00', value: 0 }, { time: '04:00', value: 0 },
+  { time: '06:00', value: 12 }, { time: '08:00', value: 45 }, { time: '10:00', value: 85 },
+  { time: '12:00', value: 110 }, { time: '14:00', value: 90 }, { time: '16:00', value: 45 },
+  { time: '18:00', value: 15 }, { time: '20:00', value: 0 }, { time: '22:00', value: 0 }
+];
+
+const DATA_7D = [
+  { time: 'Mon', value: 420 }, { time: 'Tue', value: 380 }, { time: 'Wed', value: 510 },
+  { time: 'Thu', value: 490 }, { time: 'Fri', value: 550 }, { time: 'Sat', value: 600 }, 
+  { time: 'Sun', value: 580 }
+];
+
+const DATA_30D = [
+  { time: 'Week 1', value: 3200 }, { time: 'Week 2', value: 2900 },
+  { time: 'Week 3', value: 3500 }, { time: 'Week 4', value: 3800 }
+];
+
+const ASSETS = [
+  {
+    id: 'solar',
+    name: 'Central Solar PV Array',
+    subtitle: 'Solar Array',
+    Icon: Sun,
+    status: 'Producing',
+    statusStyle: 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10',
+    iconColor: 'text-emerald-500',
+    specs: [
+      { label: 'Nameplate', value: '250 {powerScale}', valueStyle: 'text-white font-bold' },
+      { label: 'Current Output', value: '50.9 {powerScale}', valueStyle: 'text-emerald-500 font-bold' },
+      { label: 'Efficiency', value: '21.4% (Tier-1 Bifacial)', valueStyle: 'text-white font-bold' },
+      { label: 'Availability', value: '99.7%', valueStyle: 'text-blue-400 font-bold' }
+    ],
+    modalSpecs: [
+      { label: 'Panels:', value: '580W Bifacial TOPCon (540 modules)' },
+      { label: 'Inverters:', value: '2x 125 {powerScale} String Inverters (SMA)' },
+      { label: 'Tilt:', value: '24° Fixed South-facing' },
+      { label: 'Last Cleaned:', value: '3 days ago' },
+      { label: 'Next Maintenance:', value: 'In 18 days' }
+    ]
+  },
+  {
+    id: 'wind',
+    name: 'Utility Wind Turbine Mast',
+    subtitle: 'Wind Turbine',
+    Icon: Wind,
+    status: 'Generating',
+    statusStyle: 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10',
+    iconColor: 'text-emerald-500',
+    specs: [
+      { label: 'Nameplate', value: '100 {powerScale}', valueStyle: 'text-white font-bold' },
+      { label: 'Current Output', value: '37.4 {powerScale}', valueStyle: 'text-emerald-500 font-bold' },
+      { label: 'Efficiency', value: '42.8% (Betz limit norm)', valueStyle: 'text-white font-bold' },
+      { label: 'Availability', value: '98.5%', valueStyle: 'text-blue-400 font-bold' }
+    ],
+    modalSpecs: [
+      { label: 'Turbine Model:', value: 'Vestas V100 100kW' },
+      { label: 'Hub Height:', value: '65 meters' },
+      { label: 'Cut-in Speed:', value: '3.5 m/s' },
+      { label: 'Last Serviced:', value: '45 days ago' },
+      { label: 'Next Maintenance:', value: 'In 140 days' }
+    ]
+  },
+  {
+    id: 'bess',
+    name: 'Containerized BESS Storage',
+    subtitle: 'Battery Storage',
+    Icon: Battery,
+    status: 'Standby / Discharging',
+    statusStyle: 'text-emerald-500 border-emerald-500/30 bg-emerald-500/10',
+    iconColor: 'text-emerald-500',
+    specs: [
+      { label: 'Nameplate', value: '500 kWh / 120 {powerScale}', valueStyle: 'text-white font-bold' },
+      { label: 'Current Output', value: '+7.1 {powerScale}', valueStyle: 'text-emerald-500 font-bold' },
+      { label: 'Efficiency', value: '91.8% Roundtrip', valueStyle: 'text-white font-bold' },
+      { label: 'Availability', value: '100%', valueStyle: 'text-blue-400 font-bold' }
+    ],
+    modalSpecs: [
+      { label: 'Chemistry:', value: 'Lithium Iron Phosphate (LFP)' },
+      { label: 'Cycles Logged:', value: '1,420 cycles' },
+      { label: 'State of Health (SoH):', value: '98.2%' },
+      { label: 'Thermal System:', value: 'Liquid Cooled (Nominal)' },
+      { label: 'Next Maintenance:', value: 'In 210 days' }
+    ]
+  },
+  {
+    id: 'diesel',
+    name: 'Auxiliary Diesel Generator',
+    subtitle: 'Thermal Genset',
+    Icon: Droplet,
+    status: 'Standby Reserve',
+    statusStyle: 'text-slate-400 border-slate-700 bg-[#1e293b]/50/80',
+    iconColor: 'text-emerald-500',
+    specs: [
+      { label: 'Nameplate', value: '150 {powerScale}', valueStyle: 'text-white font-bold' },
+      { label: 'Current Output', value: '0 {powerScale}', valueStyle: 'text-emerald-500 font-bold' },
+      { label: 'Efficiency', value: '34.2% Brake Thermal', valueStyle: 'text-white font-bold' },
+      { label: 'Availability', value: '99.1%', valueStyle: 'text-blue-400 font-bold' }
+    ],
+    modalSpecs: [
+      { label: 'Engine Model:', value: 'Cummins QSB7-G5' },
+      { label: 'Fuel Remaining:', value: '4,200 L (84% tank)' },
+      { label: 'Run Hours:', value: '342 hrs' },
+      { label: 'Last Test Run:', value: '14 days ago' },
+      { label: 'Next Maintenance:', value: 'In 60 days' }
+    ]
+  }
+];
 
 export default function AssetsPage() {
-  const [assets, setAssets] = React.useState<any[]>([]);
+  const { currency, powerScale } = useSettings();
+  const [selectedAsset, setSelectedAsset] = useState<typeof ASSETS[0] | null>(null);
+  const [timeframe, setTimeframe] = useState<'today' | '7d' | '30d'>('today');
+  
+  // Live API State
+  const [dispatchData, setDispatchData] = useState<any[]>([]);
+  const [analyticsData, setAnalyticsData] = useState<any[]>([]);
 
+  // Fetch LIVE data from backend APIs
   React.useEffect(() => {
-    fetch('http://localhost:8000/api/microgrids/1/status')
+    // 1. Fetch Today's 24-hour dispatch curve
+    fetch('http://localhost:8000/api/dispatch')
       .then(res => res.json())
-      .then(data => {
-        // Map backend assets to frontend UI shape
-        const mappedAssets = data.assets.map((a: any) => {
-          let icon = Sun;
-          let color = "text-slate-500";
-          let bg = "bg-slate-500/10";
-          if (a.asset_type === "SOLAR") { icon = Sun; color = "text-yellow-500"; bg = "bg-yellow-500/10"; }
-          if (a.asset_type === "WIND") { icon = Wind; color = "text-blue-500"; bg = "bg-blue-500/10"; }
-          if (a.asset_type === "BATTERY") { icon = Battery; color = "text-indigo-500"; bg = "bg-indigo-500/10"; }
-          if (a.asset_type === "DIESEL") { icon = Droplet; color = "text-red-500"; bg = "bg-red-500/10"; }
-          
-          return {
-            name: a.name,
-            type: a.asset_type,
-            capacity: a.capacity_kw ? `${a.capacity_kw} kW` : `${a.capacity_kwh} kWh`,
-            output: a.current_status === "Producing" || a.current_status === "Discharging" ? "Active" : "Standby",
-            status: a.current_status,
-            efficiency: `${(a.efficiency * 100).toFixed(0)}%`,
-            health: "Good",
-            icon, color, bg
-          };
-        });
-        setAssets(mappedAssets);
-      })
-      .catch(err => console.error(err));
+      .then(data => setDispatchData(Array.isArray(data) ? data : []))
+      .catch(console.error);
+
+    // 2. Fetch Historical 30-day analytics from the SQLite Database
+    fetch('http://localhost:8000/api/analytics')
+      .then(res => res.json())
+      .then(data => setAnalyticsData(Array.isArray(data) ? data : []))
+      .catch(console.error);
   }, []);
 
+  // Dynamically map the correct live API data depending on which asset is clicked and what timeframe is selected
+  let activeChartData: any[] = [];
+  if (selectedAsset && dispatchData.length > 0) {
+    if (timeframe === 'today') {
+      activeChartData = dispatchData.map(d => ({
+        time: d.time,
+        value: selectedAsset.id === 'solar' ? d.solar :
+               selectedAsset.id === 'wind' ? d.wind :
+               selectedAsset.id === 'bess' ? d.batteryDischarge :
+               d.diesel
+      }));
+    } else {
+      const days = timeframe === '7d' ? 7 : 30;
+      // Get the last N days from the database history
+      const recentHistory = analyticsData.slice(-days);
+      
+      // Calculate a baseline daily total from the dispatch curve
+      let baseDailyTotal = 0;
+      dispatchData.forEach(h => {
+        baseDailyTotal += (
+          selectedAsset.id === 'solar' ? h.solar :
+          selectedAsset.id === 'wind' ? h.wind :
+          selectedAsset.id === 'bess' ? h.batteryDischarge : h.diesel
+        );
+      });
+
+      activeChartData = recentHistory.map(d => {
+        // Since SQLite doesn't store asset-level {powerScale} per day, we modulate the baseline 
+        // using the real daily API metrics (renewablePenetration / dieselDependency)
+        let modulatedValue = baseDailyTotal;
+        if (selectedAsset.id !== 'diesel') {
+            modulatedValue *= (d.renewablePenetration / 100);
+        } else {
+            modulatedValue *= (d.dieselDependency / 100);
+        }
+
+        return {
+          time: d.day, // e.g. "Day 1"
+          value: Math.round(modulatedValue)
+        };
+      });
+    }
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-6xl mx-auto pb-12 relative">
+      {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Energy Assets</h2>
-        <p className="text-slate-400">Detailed view and control of all microgrid generation and storage assets.</p>
+        <div className="flex items-center gap-3 mb-1">
+          <h2 className="text-2xl font-bold tracking-tight text-white">Energy Assets Registry & Health</h2>
+          <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20">
+            4 Operational Assets
+          </span>
+        </div>
+        <p className="text-slate-400 text-sm">Real-time asset telemetry, operational limits, health metrics, and preventative maintenance schedules</p>
       </div>
 
+      {/* Grid of Assets */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {assets.map((asset, idx) => {
-          const Icon = asset.icon;
-          return (
-            <Card key={idx} className="bg-slate-900 border-slate-800">
-              <CardHeader className="flex flex-row items-start justify-between pb-2">
-                <div className="flex items-center gap-3">
-                  <div className={`p-3 rounded-lg ${asset.bg} ${asset.color}`}>
-                    <Icon size={24} />
+        {ASSETS.map((asset) => (
+          <Card key={asset.id} className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden shadow-xl flex flex-col">
+            <CardContent className="p-6 flex-1 flex flex-col">
+              
+              <div className="flex justify-between items-start mb-8">
+                <div className="flex gap-4 items-start">
+                  <div className={`p-2.5 rounded-xl bg-[#1e293b]/50/80 border border-slate-700/50 ${asset.iconColor}`}>
+                    <asset.Icon size={24} />
                   </div>
                   <div>
-                    <CardTitle className="text-lg">{asset.name}</CardTitle>
-                    <p className="text-sm text-slate-400">{asset.type} Asset</p>
+                    <h3 className="text-lg font-bold text-white leading-tight mb-1">{asset.name}</h3>
+                    <p className="text-sm text-slate-400">{asset.subtitle}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-xs font-medium border border-slate-700">
-                  <Activity size={14} className={asset.status === 'Producing' ? 'text-emerald-500' : 'text-slate-400'} />
+                <div className={`px-3 py-1 rounded-full text-xs font-medium border ${asset.statusStyle}`}>
                   {asset.status}
                 </div>
-              </CardHeader>
-              <CardContent className="mt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Rated Capacity</p>
-                    <p className="font-medium text-slate-200">{asset.capacity}</p>
+              </div>
+
+              <div className="grid grid-cols-4 gap-4 mb-8">
+                {asset.specs.map((spec, i) => (
+                  <div key={i}>
+                    <p className="text-[11px] text-white0 mb-1">{spec.label}</p>
+                    <p className={`text-sm ${spec.valueStyle}`}>{spec.value.replace(/\{powerScale\}/g, powerScale)}</p>
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Current Output</p>
-                    <p className={`font-bold ${asset.color}`}>{asset.output}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">Operating Efficiency</p>
-                    <p className="font-medium text-slate-200">{asset.efficiency}</p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-xs text-slate-500">System Health</p>
-                    <p className={`font-medium flex items-center gap-1 ${asset.health.includes('Maintenance') ? 'text-yellow-500' : 'text-emerald-500'}`}>
-                      {asset.health.includes('Maintenance') && <AlertCircle size={14} />}
-                      {asset.health}
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-6 flex gap-2">
-                  <button className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-sm font-medium rounded transition-colors text-slate-200">Diagnostics</button>
-                  <button className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-sm font-medium rounded transition-colors text-slate-200">Configure</button>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                ))}
+              </div>
+
+              <div className="mt-auto pt-6 border-t border-slate-800/50/80 flex justify-between items-center">
+                <span className="text-xs text-white0">Click to inspect telemetry history</span>
+                <button 
+                  onClick={() => setSelectedAsset(asset)}
+                  className="text-emerald-500 text-xs font-bold hover:text-emerald-300 transition-colors flex items-center gap-1 group"
+                >
+                  Asset Details <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </button>
+              </div>
+
+            </CardContent>
+          </Card>
+        ))}
       </div>
+
+      {/* Modal Overlay */}
+      {selectedAsset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-[#111827] border border-slate-800/50 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            
+            <div className="flex items-start justify-between p-6 border-b border-slate-800/50/50">
+              <div className="flex gap-4 items-center">
+                <div className={`p-2 rounded bg-[#1e293b]/50 ${selectedAsset.iconColor}`}>
+                  <selectedAsset.Icon size={28} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-white leading-none mb-1.5">{selectedAsset.name}</h3>
+                  <p className="text-slate-400 text-sm">{selectedAsset.subtitle} Telemetry & Diagnostics</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedAsset(null)}
+                className="text-slate-400 hover:text-white p-2 rounded hover:bg-[#1e293b]/50 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-8 pb-4">
+              <div className="flex justify-between items-center mb-6">
+                <h4 className="text-sm font-bold text-white">Historical Telemetry Curve</h4>
+                <div className="flex bg-[#1e293b]/50/50 rounded-xl p-1 border border-slate-700/50">
+                  <button 
+                    onClick={() => setTimeframe('today')}
+                    className={`px-4 py-1 text-xs font-bold rounded transition-colors ${timeframe === 'today' ? 'bg-emerald-500/20 text-emerald-500' : 'text-slate-400 hover:text-slate-200'}`}
+                  >
+                    Today
+                  </button>
+                  <button 
+                    onClick={() => setTimeframe('7d')}
+                    className={`px-4 py-1 text-xs font-bold rounded transition-colors ${timeframe === '7d' ? 'bg-emerald-500/20 text-emerald-500' : 'text-slate-400 hover:text-slate-200'}`}
+                  >
+                    7d
+                  </button>
+                  <button 
+                    onClick={() => setTimeframe('30d')}
+                    className={`px-4 py-1 text-xs font-bold rounded transition-colors ${timeframe === '30d' ? 'bg-emerald-500/20 text-emerald-500' : 'text-slate-400 hover:text-slate-200'}`}
+                  >
+                    30d
+                  </button>
+                </div>
+              </div>
+
+              <div className="h-64 w-full mb-8 relative">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={activeChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#1e293b" />
+                    <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
+                    <YAxis 
+                      domain={[0, 'auto']} 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{fill: '#64748b', fontSize: 12}} 
+                      tickFormatter={(val) => `${val} ${powerScale}`} 
+                    />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }}
+                      itemStyle={{ color: '#10b981' }}
+                    />
+                    <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {selectedAsset.modalSpecs.map((spec, i) => (
+                  <div key={i} className="flex justify-between items-center p-4 bg-[#0f172a] rounded-xl border border-slate-800/50">
+                    <span className="text-white0 text-sm">{spec.label}</span>
+                    <span className="text-white font-bold text-sm">{spec.value.replace(/\{powerScale\}/g, powerScale)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6 pt-4 flex justify-end">
+              <button 
+                onClick={() => setSelectedAsset(null)}
+                className="px-6 py-2.5 bg-[#1e293b] hover:bg-slate-700 text-white text-sm font-bold rounded-xl transition-colors border border-slate-700"
+              >
+                Close Diagnostic View
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

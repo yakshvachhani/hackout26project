@@ -1,5 +1,6 @@
 'use client';
 
+import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -16,16 +17,16 @@ const SCENARIOS = [
     riskColor: "text-blue-400",
     icon: Fuel,
     themeColor: "#f59e0b",
-    description: "Diesel price spikes to ₹120/L due to supply bottlenecks in remote terrain.",
+    description: "Diesel price spikes to {currency}120/L due to supply bottlenecks in remote terrain.",
     costChange: "+28.5%",
     costChangeColor: "text-red-500",
     chartData: [
-      { metric: 'Operating Cost (x10 ₹)', base: 324, scenario: 416 },
+      { metric: 'Operating Cost (x10 {currency})', base: 324, scenario: 416 },
       { metric: 'Diesel Cons. (L)', base: 52, scenario: 45 },
       { metric: 'Carbon (kg)', base: 126, scenario: 118 },
     ],
     mitigation: "Accelerate scheduled water pumping into 11:00-14:00 solar hours to avert costly evening generator dispatch.",
-    assessment: "Healthcare clinic (12 kW) and drinking water pump circuit are fully protected with isolated battery bus priority under this scenario."
+    assessment: "Healthcare clinic (12 {powerScale}) and drinking water pump circuit are fully protected with isolated battery bus priority under this scenario."
   },
   {
     id: 2,
@@ -38,7 +39,7 @@ const SCENARIOS = [
     costChange: "-38.2%",
     costChangeColor: "text-emerald-500",
     chartData: [
-      { metric: 'Operating Cost (x10 ₹)', base: 324, scenario: 200 },
+      { metric: 'Operating Cost (x10 {currency})', base: 324, scenario: 200 },
       { metric: 'Diesel Cons. (L)', base: 52, scenario: 0 },
       { metric: 'Carbon (kg)', base: 126, scenario: 0 },
     ],
@@ -52,11 +53,11 @@ const SCENARIOS = [
     riskColor: "text-yellow-500",
     icon: CloudRain,
     themeColor: "#3b82f6",
-    description: "Heavy overcast monsoon conditions reduce solar output from 220 kW to 85 kW peak.",
+    description: "Heavy overcast monsoon conditions reduce solar output from 220 {powerScale} to 85 {powerScale} peak.",
     costChange: "+42.0%",
     costChangeColor: "text-red-500",
     chartData: [
-      { metric: 'Operating Cost (x10 ₹)', base: 324, scenario: 460 },
+      { metric: 'Operating Cost (x10 {currency})', base: 324, scenario: 460 },
       { metric: 'Diesel Cons. (L)', base: 52, scenario: 115 },
       { metric: 'Carbon (kg)', base: 126, scenario: 285 },
     ],
@@ -74,7 +75,7 @@ const SCENARIOS = [
     costChange: "+31.0%",
     costChangeColor: "text-red-500",
     chartData: [
-      { metric: 'Operating Cost (x10 ₹)', base: 324, scenario: 424 },
+      { metric: 'Operating Cost (x10 {currency})', base: 324, scenario: 424 },
       { metric: 'Diesel Cons. (L)', base: 52, scenario: 85 },
       { metric: 'Carbon (kg)', base: 126, scenario: 195 },
     ],
@@ -92,7 +93,7 @@ const SCENARIOS = [
     costChange: "-24.6%",
     costChangeColor: "text-emerald-500",
     chartData: [
-      { metric: 'Operating Cost (x10 ₹)', base: 324, scenario: 244 },
+      { metric: 'Operating Cost (x10 {currency})', base: 324, scenario: 244 },
       { metric: 'Diesel Cons. (L)', base: 52, scenario: 15 },
       { metric: 'Carbon (kg)', base: 126, scenario: 40 },
     ],
@@ -102,17 +103,18 @@ const SCENARIOS = [
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
+  const { currency } = useSettings();
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 border border-slate-700 p-3 rounded-lg shadow-xl min-w-[200px]">
-        <p className="text-slate-300 font-bold mb-2">{label.replace(' (x10 ₹)', '')}</p>
+      <div className="bg-[#0f172a] border border-slate-700 p-3 rounded-xl shadow-xl min-w-[200px]">
+        <p className="text-slate-300 font-bold mb-2">{label.replace(` (x10 ${currency})`, '')}</p>
         {payload.map((entry: any, index: number) => {
           let val = entry.value;
           let unit = "";
           let prefix = "";
           if (label.includes('Cost')) {
             val = val * 10;
-            prefix = "₹";
+            prefix = currency;
           } else if (label.includes('Diesel')) {
             unit = " L";
           } else if (label.includes('Carbon')) {
@@ -124,7 +126,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
                 <span className="text-slate-400">{entry.name}:</span>
               </div>
-              <span className="text-slate-50 font-bold">{prefix}{val.toLocaleString()}{unit}</span>
+              <span className="text-white font-bold">{prefix}{val.toLocaleString()}{unit}</span>
             </div>
           );
         })}
@@ -135,6 +137,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function ScenariosPage() {
+  const { currency, powerScale } = useSettings();
   const [activeId, setActiveId] = useState(1);
   const activeScenario = SCENARIOS.find(s => s.id === activeId) || SCENARIOS[0];
 
@@ -161,21 +164,21 @@ export default function ScenariosPage() {
               key={scenario.id}
               onClick={() => setActiveId(scenario.id)}
               className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[160px]
-                ${isActive ? 'bg-slate-900 border-2 shadow-lg scale-[1.02]' : 'bg-slate-900/50 border-slate-800 hover:bg-slate-800/80'}`}
+                ${isActive ? 'bg-[#0f172a] border-2 shadow-lg scale-[1.02]' : 'bg-[#0f172a]/50 border-slate-800/50 hover:bg-[#1e293b]/50/80'}`}
               style={{ borderColor: isActive ? scenario.themeColor : undefined }}
             >
               <div>
                 <div className="flex justify-between items-start mb-3">
-                  <div className={`p-2 rounded-lg ${isActive ? '' : 'bg-slate-800'}`} style={{ backgroundColor: isActive ? `${scenario.themeColor}33` : undefined }}>
+                  <div className={`p-2 rounded-xl ${isActive ? '' : 'bg-[#1e293b]/50'}`} style={{ backgroundColor: isActive ? `${scenario.themeColor}33` : undefined }}>
                     <Icon size={16} className={isActive ? '' : 'text-slate-400'} style={{ color: isActive ? scenario.themeColor : undefined }} />
                   </div>
                   <span className={`text-xs font-bold ${scenario.riskColor}`}>{scenario.riskLevel}</span>
                 </div>
                 <h3 className="font-bold text-slate-100 text-sm mb-2">{scenario.title}</h3>
-                <p className="text-xs text-slate-400 line-clamp-3">{scenario.description}</p>
+                <p className="text-xs text-slate-400 line-clamp-3">{scenario.description.replace(/\{currency\}/g, currency).replace(/\{powerScale\}/g, powerScale)}</p>
               </div>
               <div className="mt-4 flex justify-between items-end">
-                <span className="text-xs text-slate-500">Cost:</span>
+                <span className="text-xs text-white0">Cost:</span>
                 <span className={`text-xs font-bold ${scenario.costChangeColor}`}>{scenario.costChange}</span>
               </div>
             </div>
@@ -187,11 +190,11 @@ export default function ScenariosPage() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
         {/* Bar Chart */}
-        <Card className="bg-slate-900 border-slate-800 xl:col-span-2 flex flex-col">
-          <CardHeader className="flex flex-row items-start justify-between pb-2 border-b border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50 xl:col-span-2 flex flex-col">
+          <CardHeader className="flex flex-row items-start justify-between pb-2 border-b border-slate-800/50">
             <div>
               <CardTitle className="text-base text-slate-200">Baseline vs. {activeScenario.title}</CardTitle>
-              <p className="text-xs text-slate-500 font-normal mt-1">Side-by-side financial, fuel, and ecological variance</p>
+              <p className="text-xs text-white0 font-normal mt-1">Side-by-side financial, fuel, and ecological variance</p>
             </div>
             <div className="text-sm font-bold">
               <span className="text-slate-400 font-normal">Risk: </span>
@@ -214,8 +217,8 @@ export default function ScenariosPage() {
         </Card>
 
         {/* Text Panel */}
-        <Card className="bg-slate-900 border-slate-800 flex flex-col">
-          <CardHeader className="border-b border-slate-800 pb-4">
+        <Card className="bg-[#0f172a] border-slate-800/50 flex flex-col">
+          <CardHeader className="border-b border-slate-800/50 pb-4">
             <CardTitle className="text-base text-slate-200 flex items-center gap-2">
               <Sparkles size={18} className="text-amber-400" /> Strategic Optimization Response
             </CardTitle>
@@ -233,14 +236,14 @@ export default function ScenariosPage() {
               <div>
                 <h4 className="text-slate-200 font-bold text-sm mb-2">Critical Load Security Assessment:</h4>
                 <p className="text-sm text-slate-400 leading-relaxed">
-                  {activeScenario.assessment}
+                  {activeScenario.assessment.replace(/\{currency\}/g, currency).replace(/\{powerScale\}/g, powerScale)}
                 </p>
               </div>
 
             </div>
 
-            <div className="mt-8 pt-4 border-t border-slate-800 flex justify-between items-center text-xs">
-              <span className="text-slate-500">Simulation engine: Mixed-Integer Heuristic</span>
+            <div className="mt-8 pt-4 border-t border-slate-800/50 flex justify-between items-center text-xs">
+              <span className="text-white0">Simulation engine: Mixed-Integer Heuristic</span>
               <span className="text-emerald-500 font-bold">Stable Solution</span>
             </div>
           </CardContent>

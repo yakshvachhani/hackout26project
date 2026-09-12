@@ -1,5 +1,6 @@
 'use client';
 
+import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, ShieldCheck, Sun, Zap } from 'lucide-react';
@@ -8,6 +9,7 @@ import {
 } from 'recharts';
 
 export default function AnalyticsPage() {
+  const { currency, powerScale } = useSettings();
   const [range, setRange] = useState('30d');
 
   const [historyData, setHistoryData] = useState<any[]>([]);
@@ -31,7 +33,7 @@ export default function AnalyticsPage() {
           <h2 className="text-2xl font-bold tracking-tight">Historical Analytics</h2>
           <p className="text-slate-400">Performance, reliability, and uptime metrics over time.</p>
         </div>
-        <div className="flex bg-slate-800 rounded-md p-1">
+        <div className="flex bg-[#1e293b]/50 rounded-md p-1">
           {['7d', '30d', '90d'].map((r) => (
             <button 
               key={r}
@@ -45,47 +47,47 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">System Uptime</CardTitle>
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">{avgUptime}%</div>
-            <p className="text-xs text-slate-500 mt-1">Over 30 days</p>
+            <div className="text-2xl font-bold text-white">{avgUptime}%</div>
+            <p className="text-xs text-white0 mt-1">Over 30 days</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">Avg. Renewable Share</CardTitle>
             <Sun className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">{avgRenewable}%</div>
-            <p className="text-xs text-slate-500 mt-1">Target &gt; 80%</p>
+            <div className="text-2xl font-bold text-white">{avgRenewable}%</div>
+            <p className="text-xs text-white0 mt-1">Target &gt; 80%</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">Avg. Diesel Dependency</CardTitle>
             <Activity className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">{avgDiesel}%</div>
-            <p className="text-xs text-slate-500 mt-1">Decreased from 18% last month</p>
+            <div className="text-2xl font-bold text-white">{avgDiesel}%</div>
+            <p className="text-xs text-white0 mt-1">Decreased from 18% last month</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-400">Unserved Energy</CardTitle>
             <Zap className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-slate-50">42 kWh</div>
-            <p className="text-xs text-slate-500 mt-1">0 critical load drops</p>
+            <div className="text-2xl font-bold text-white">42 kWh</div>
+            <p className="text-xs text-white0 mt-1">0 critical load drops</p>
           </CardContent>
         </Card>
       </div>
@@ -93,7 +95,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Renewable Penetration Chart */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
           <CardHeader>
             <CardTitle>Renewable Penetration & Diesel Trend</CardTitle>
           </CardHeader>
@@ -115,7 +117,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Uptime / Outage Chart */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
           <CardHeader>
             <CardTitle>System Uptime & Outage Events</CardTitle>
           </CardHeader>
