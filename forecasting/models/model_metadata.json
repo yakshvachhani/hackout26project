@@ -1,0 +1,87 @@
+{
+  "created_at": "2026-09-12T10:28:23.971447",
+  "data_mode": "LIVE_OPEN_METEO",
+  "historical_days": 90,
+  "train_rows": 1764,
+  "test_rows": 441,
+  "solar_features": [
+    "hour_of_day",
+    "day_of_week",
+    "sin_hour",
+    "cos_hour",
+    "sin_day",
+    "cos_day",
+    "cloud_cover",
+    "shortwave_radiation",
+    "temperature_2m",
+    "solar_lag_1",
+    "solar_lag_2",
+    "solar_lag_3",
+    "radiation_lag_1",
+    "radiation_lag_2",
+    "radiation_lag_3",
+    "cloud_cover_lag_1",
+    "solar_rolling_mean_3h"
+  ],
+  "wind_features": [
+    "hour_of_day",
+    "day_of_week",
+    "sin_hour",
+    "cos_hour",
+    "sin_day",
+    "cos_day",
+    "wind_speed_10m",
+    "wind_speed_80m",
+    "wind_lag_1",
+    "wind_lag_2",
+    "wind_lag_3",
+    "wind_speed_80m_lag_1",
+    "wind_speed_80m_lag_2",
+    "wind_speed_80m_lag_3",
+    "wind_rolling_mean_3h"
+  ],
+  "solar_capacity_kw": 100.0,
+  "wind_capacity_kw": 100.0,
+  "benchmarks": {
+    "solar": {
+      "persistence": {
+        "mae": 3.6949433106575964,
+        "rmse": 7.640834252394327,
+        "r2": 0.8888282007346863
+      },
+      "lstm": {
+        "mae": 2.637562691424118,
+        "rmse": 4.846753810409381,
+        "r2": 0.9552683418193698
+      },
+      "xgboost": {
+        "mae": 0.5312276810225625,
+        "rmse": 0.9583620293917929,
+        "r2": 0.9982510706188797
+      }
+    },
+    "wind": {
+      "persistence": {
+        "mae": 14.69936507936508,
+        "rmse": 29.733107027600383,
+        "r2": -0.15877417293663454
+      },
+      "lstm": {
+        "mae": 10.869450597092678,
+        "rmse": 21.22895021507635,
+        "r2": 0.40928873124581966
+      },
+      "xgboost": {
+        "mae": 1.0150388284983818,
+        "rmse": 2.495516695888488,
+        "r2": 0.991837199578021
+      }
+    }
+  },
+  "residuals": {
+    "solar_res_std": 0.9361984931088386,
+    "solar_res_mean": -0.20491500892002995,
+    "wind_res_std": 2.4553781752684416,
+    "wind_res_mean": -0.44578200487863434
+  }
+}
