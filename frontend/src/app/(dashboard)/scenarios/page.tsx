@@ -103,7 +103,7 @@ const SCENARIOS = [
 ];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
-  const { currency } = useSettings();
+  const { currency, formatCurrency, formatPower } = useSettings();
   if (active && payload && payload.length) {
     return (
       <div className="bg-[#0f172a] border border-slate-700 p-3 rounded-xl shadow-xl min-w-[200px]">
@@ -137,7 +137,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function ScenariosPage() {
-  const { currency, powerScale } = useSettings();
+  const { currency, powerScale, formatCurrency, formatPower } = useSettings();
   const [activeId, setActiveId] = useState(1);
   const activeScenario = SCENARIOS.find(s => s.id === activeId) || SCENARIOS[0];
 
@@ -175,7 +175,7 @@ export default function ScenariosPage() {
                   <span className={`text-xs font-bold ${scenario.riskColor}`}>{scenario.riskLevel}</span>
                 </div>
                 <h3 className="font-bold text-slate-100 text-sm mb-2">{scenario.title}</h3>
-                <p className="text-xs text-slate-400 line-clamp-3">{scenario.description.replace(/\{currency\}/g, currency).replace(/\{powerScale\}/g, powerScale)}</p>
+                <p className="text-xs text-slate-400 line-clamp-3">{scenario.description.replace(/\{currency\}([\d,]+)/g, (m, num) => formatCurrency(parseFloat(num.replace(/,/g,'')))).replace(/([\d,]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g,''))))}</p>
               </div>
               <div className="mt-4 flex justify-between items-end">
                 <span className="text-xs text-white0">Cost:</span>
@@ -236,7 +236,7 @@ export default function ScenariosPage() {
               <div>
                 <h4 className="text-slate-200 font-bold text-sm mb-2">Critical Load Security Assessment:</h4>
                 <p className="text-sm text-slate-400 leading-relaxed">
-                  {activeScenario.assessment.replace(/\{currency\}/g, currency).replace(/\{powerScale\}/g, powerScale)}
+                  {activeScenario.assessment.replace(/\{currency\}([\d,]+)/g, (m, num) => formatCurrency(parseFloat(num.replace(/,/g,'')))).replace(/([\d,]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g,''))))}
                 </p>
               </div>
 

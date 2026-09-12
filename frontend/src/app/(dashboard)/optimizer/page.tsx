@@ -46,6 +46,13 @@ export default function OptimizerPage() {
       });
       const data = await response.json();
       
+      if (!response.ok || !data.dispatch_plan) {
+        console.error('Optimization failed:', data);
+        setIsOptimizing(false);
+        alert('Failed to run optimization. Make sure the backend is running and data is available.');
+        return;
+      }
+
       // Calculate real totals from the Live 24h API Dispatch array
       let solarSum = 0, windSum = 0, battSum = 0, dieselSum = 0;
       data.dispatch_plan.forEach((h: any) => {

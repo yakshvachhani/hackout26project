@@ -83,7 +83,7 @@ const REPORT_DATA = {
 type TabKey = keyof typeof REPORT_DATA;
 
 export default function ReportsPage() {
-  const { currency, powerScale } = useSettings();
+  const { currency, powerScale, formatCurrency, formatPower } = useSettings();
   const [activeTab, setActiveTab] = useState<TabKey>('daily');
 
   const activeData = REPORT_DATA[activeTab];
@@ -94,7 +94,7 @@ export default function ReportsPage() {
     
     activeData.table.forEach(row => {
       // Clean up text if needed and join with commas
-      const rowString = `${row.asset},${row.cap.replace(/\{powerScale\}/g, powerScale)},${row.energy},${row.cf},${row.avail},${row.status}`;
+      const rowString = `${row.asset},${formatPower(parseFloat(row.cap.replace(/[^0-9.-]+/g,"")))},${row.energy},${row.cf},${row.avail},${row.status}`;
       csvContent += rowString + "\n";
     });
 
@@ -179,8 +179,8 @@ export default function ReportsPage() {
           </div>
           <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-slate-800/50 print:bg-[#1e293b]/50 print:border-slate-800/50">
             <div className="text-xs text-slate-400 mb-2 print:text-white0">Operating Cost</div>
-            <div className="text-2xl font-bold text-emerald-500 print:text-emerald-600 mb-1">{activeData.cost.replace(/\{currency\}/g, currency)}</div>
-            <div className="text-xs text-emerald-500 font-medium">Saved {activeData.saved.replace(/\{currency\}/g, currency)}</div>
+            <div className="text-2xl font-bold text-emerald-500 print:text-emerald-600 mb-1">{formatCurrency(parseFloat(activeData.cost.replace(/[^0-9.-]+/g,"")))}</div>
+            <div className="text-xs text-emerald-500 font-medium">Saved {formatCurrency(parseFloat(activeData.saved.replace(/[^0-9.-]+/g,"")))}</div>
           </div>
           <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-slate-800/50 print:bg-[#1e293b]/50 print:border-slate-800/50">
             <div className="text-xs text-slate-400 mb-2 print:text-white0">Diesel Displaced</div>

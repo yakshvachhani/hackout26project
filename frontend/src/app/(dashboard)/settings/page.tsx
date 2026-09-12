@@ -3,8 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Settings2, Activity, Zap, Database, RotateCcw, CheckCircle2, Save, RefreshCw } from 'lucide-react';
+import { useSettings } from '@/contexts/SettingsContext';
 
 export default function SettingsPage() {
+  const { setSettings } = useSettings();
+  
   // Toggle states
   const [currency, setCurrency] = useState('₹');
   const [powerScale, setPowerScale] = useState('kW');
@@ -40,7 +43,7 @@ export default function SettingsPage() {
     // Simulate backend API save & write to local storage to persist across tabs/navigations
     setTimeout(() => {
       const config = { currency, powerScale, solarCap, windCap, bessCap, dieselPrice };
-      localStorage.setItem('microgrid_settings', JSON.stringify(config));
+      setSettings(config);
       
       setIsSaving(false);
       setShowSuccess(true);
@@ -61,43 +64,41 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto pb-12">
+    <div className="space-y-6">
       
-      {/* Header */}
-      <div>
-        <div className="flex items-center gap-3 mb-1">
-          <h2 className="text-2xl font-bold tracking-tight text-white">System Settings & Configuration</h2>
-          <span className="px-2 py-0.5 bg-slate-800 text-slate-300 text-[10px] font-bold rounded uppercase tracking-wider border border-slate-700">
-            OPERATOR CONTROL
-          </span>
+      {/* Top Title */}
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-slate-800 rounded-lg">
+          <Settings2 size={24} className="text-slate-300" />
         </div>
-        <p className="text-slate-400 text-sm">Display units, economic currency setpoints, hardware ratings, and backend API diagnostic checks</p>
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">System Configuration</h1>
+          <p className="text-sm text-slate-400 mt-1">Manage global display formats and baseline asset sizing</p>
+        </div>
       </div>
 
-      {/* Top Grid: Units & Hardware */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Left Panel: Units & Currency */}
+        {/* Left Panel: Preferences */}
         <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl h-full">
           <CardHeader className="pb-4 border-b border-slate-800/50">
             <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
-              <Settings2 size={16} className="text-emerald-500" /> Display Units & Currency Setpoints
+              <Database size={16} className="text-indigo-500" /> Global Formatting
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-8">
             
-            {/* Economic Currency */}
-            <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
+            <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-sm font-bold text-slate-200">Economic Currency</h4>
-                <p className="text-xs text-white0 mt-1">Primary denomination for costs, savings, and tariffs</p>
+                <h4 className="text-sm font-bold text-slate-200">Currency Display</h4>
+                <p className="text-xs text-slate-400 mt-1">Preferred fiat conversion for all costs</p>
               </div>
-              <div className="flex bg-[#0f172a] rounded-lg p-1 border border-slate-700/50">
+              <div className="flex bg-[#1e293b] rounded-lg p-1 border border-slate-700/50">
                 {['₹', '$', '€'].map(cur => (
                   <button 
                     key={cur}
                     onClick={() => setCurrency(cur)}
-                    className={`w-10 py-1.5 text-sm font-bold rounded-md transition-colors ${currency === cur ? 'bg-emerald-600 text-white shadow-md' : 'text-white0 hover:text-slate-300'}`}
+                    className={`w-10 py-1.5 text-sm font-bold rounded-md transition-colors ${currency === cur ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
                   >
                     {cur}
                   </button>
@@ -105,18 +106,17 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Power Rating Scale */}
-            <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
+            <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-sm font-bold text-slate-200">Power Rating Scale</h4>
-                <p className="text-xs text-white0 mt-1">Default metric representation for capacity and load</p>
+                <p className="text-xs text-slate-400 mt-1">Default metric representation for capacity</p>
               </div>
-              <div className="flex bg-[#0f172a] rounded-lg p-1 border border-slate-700/50">
+              <div className="flex bg-[#1e293b] rounded-lg p-1 border border-slate-700/50">
                 {['kW', 'MW'].map(unit => (
                   <button 
                     key={unit}
                     onClick={() => setPowerScale(unit)}
-                    className={`w-12 py-1.5 text-xs font-bold rounded-md transition-colors ${powerScale === unit ? 'bg-blue-600 text-white shadow-md' : 'text-white0 hover:text-slate-300'}`}
+                    className={`w-12 py-1.5 text-xs font-bold rounded-md transition-colors ${currency === unit ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
                   >
                     {unit}
                   </button>
@@ -128,7 +128,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Right Panel: Asset Sizing */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl h-full flex flex-col">
+        <Card className="lg:col-span-2 bg-[#0f172a] border-slate-800/50 rounded-xl h-full flex flex-col">
           <CardHeader className="pb-4 border-b border-slate-800/50">
             <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
               <Zap size={16} className="text-amber-500" /> Asset Sizing & Fuel Pricing
@@ -181,7 +181,7 @@ export default function SettingsPage() {
             <div className="flex justify-between items-end mt-8">
               <button 
                 onClick={handleReset}
-                className="text-xs text-white0 hover:text-slate-300 underline decoration-slate-700 underline-offset-4 transition-colors"
+                className="text-xs text-slate-400 hover:text-slate-200 underline decoration-slate-700 underline-offset-4 transition-colors"
               >
                 Reset to Site Defaults
               </button>
@@ -228,7 +228,7 @@ export default function SettingsPage() {
             <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
               <div>
                 <h4 className="text-sm font-bold text-slate-200">Open-Meteo REST API</h4>
-                <p className="text-[11px] text-white0 mt-0.5">Free, No-Key Weather Telemetry</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Free, No-Key Weather Telemetry</p>
               </div>
               <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -240,7 +240,7 @@ export default function SettingsPage() {
             <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
               <div>
                 <h4 className="text-sm font-bold text-slate-200">Gemini AI Assistant</h4>
-                <p className="text-[11px] text-white0 mt-0.5">Energy Intelligence Engine</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Energy Intelligence Engine</p>
               </div>
               <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -252,7 +252,7 @@ export default function SettingsPage() {
             <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
               <div>
                 <h4 className="text-sm font-bold text-slate-200">LP Dispatch Solver</h4>
-                <p className="text-[11px] text-white0 mt-0.5">Multi-interval Optimization</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Multi-interval Optimization</p>
               </div>
               <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>

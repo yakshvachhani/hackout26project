@@ -116,7 +116,7 @@ const ASSETS = [
 ];
 
 export default function AssetsPage() {
-  const { currency, powerScale } = useSettings();
+  const { currency, powerScale, formatCurrency, formatPower } = useSettings();
   const [selectedAsset, setSelectedAsset] = useState<typeof ASSETS[0] | null>(null);
   const [timeframe, setTimeframe] = useState<'today' | '7d' | '30d'>('today');
   
@@ -221,7 +221,7 @@ export default function AssetsPage() {
                 {asset.specs.map((spec, i) => (
                   <div key={i}>
                     <p className="text-[11px] text-white0 mb-1">{spec.label}</p>
-                    <p className={`text-sm ${spec.valueStyle}`}>{spec.value.replace(/\{powerScale\}/g, powerScale)}</p>
+                    <p className={`text-sm ${spec.valueStyle}`}>{spec.value.includes("{powerScale}") ? formatPower(parseFloat(spec.value.replace(/[^0-9.-]+/g,""))) : spec.value}</p>
                   </div>
                 ))}
               </div>
@@ -305,7 +305,7 @@ export default function AssetsPage() {
                       axisLine={false} 
                       tickLine={false} 
                       tick={{fill: '#64748b', fontSize: 12}} 
-                      tickFormatter={(val) => `${val} ${powerScale}`} 
+                      tickFormatter={(val) => formatPower(val)} 
                     />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }}
@@ -320,7 +320,7 @@ export default function AssetsPage() {
                 {selectedAsset.modalSpecs.map((spec, i) => (
                   <div key={i} className="flex justify-between items-center p-4 bg-[#0f172a] rounded-xl border border-slate-800/50">
                     <span className="text-white0 text-sm">{spec.label}</span>
-                    <span className="text-white font-bold text-sm">{spec.value.replace(/\{powerScale\}/g, powerScale)}</span>
+                    <span className="text-white font-bold text-sm">{spec.value.includes("{powerScale}") ? formatPower(parseFloat(spec.value.replace(/[^0-9.-]+/g,""))) : spec.value}</span>
                   </div>
                 ))}
               </div>
