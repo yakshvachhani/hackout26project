@@ -87,9 +87,9 @@ Built with ❤️ by a team of 4 for **HackOut'26**:
 | Name | Role / GitHub |
 | :--- | :--- |
 | **Daksh Kevadiya** | [GitHub Profile](https://github.com/dakshkevadiya) |
-| **Team Member 2** | [GitHub Profile](https://github.com/) |
-| **Team Member 3** | [GitHub Profile](https://github.com/) |
-| **Team Member 4** | [GitHub Profile](https://github.com/) |
+| **Yaksh Vachhani** | [GitHub Profile](https://github.com/yakshvachhanis) |
+| **Pal Patel** | [GitHub Profile](https://github.com/pal0611) |
+| **Dhruvi Ambaliya** | [GitHub Profile](https://github.com/dhruvi544) |
 
 ---
 
