@@ -106,8 +106,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   const { currency, formatCurrency, formatPower } = useSettings();
   if (active && payload && payload.length) {
     return (
-      <div className="bg-[#0f172a] border border-slate-700 p-3 rounded-xl shadow-xl min-w-[200px]">
-        <p className="text-slate-300 font-bold mb-2">{label.replace(` (x10 ${currency})`, '')}</p>
+      <div className="bg-surface border border-outline p-3 rounded-xl shadow-xl min-w-[200px]">
+        <p className="text-on-surface-variant font-bold mb-2">{label.replace(` (x10 ${currency})`, '')}</p>
         {payload.map((entry: any, index: number) => {
           let val = entry.value;
           let unit = "";
@@ -124,9 +124,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
             <div key={index} className="flex items-center justify-between text-sm mt-1">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
-                <span className="text-slate-400">{entry.name}:</span>
+                <span className="text-outline">{entry.name}:</span>
               </div>
-              <span className="text-white font-bold">{prefix}{val.toLocaleString()}{unit}</span>
+              <span className="text-on-surface font-bold">{prefix}{val.toLocaleString()}{unit}</span>
             </div>
           );
         })}
@@ -146,12 +146,12 @@ export default function ScenariosPage() {
       {/* Header Section */}
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-3">
-          <h2 className="text-2xl font-bold tracking-tight text-white">What-If Scenario Simulator & Stress Testing</h2>
+          <h2 className="text-2xl font-bold tracking-tight text-on-surface">What-If Scenario Simulator & Stress Testing</h2>
           <span className="px-2 py-1 bg-amber-500/20 text-amber-500 text-[10px] font-bold rounded uppercase tracking-wider border border-amber-500/30">
             Monte Carlo Stress Suite
           </span>
         </div>
-        <p className="text-slate-400 text-sm">Simulate volatile fuel shocks, severe weather depressions, asset trips, and community load expansions</p>
+        <p className="text-outline text-sm">Simulate volatile fuel shocks, severe weather depressions, asset trips, and community load expansions</p>
       </div>
 
       {/* Scenario Cards Row */}
@@ -164,21 +164,21 @@ export default function ScenariosPage() {
               key={scenario.id}
               onClick={() => setActiveId(scenario.id)}
               className={`p-4 rounded-xl border cursor-pointer transition-all duration-200 flex flex-col justify-between min-h-[160px]
-                ${isActive ? 'bg-[#0f172a] border-2 shadow-lg scale-[1.02]' : 'bg-[#0f172a]/50 border-slate-800/50 hover:bg-[#1e293b]/50/80'}`}
+                ${isActive ? 'bg-surface border-2 shadow-lg scale-[1.02]' : 'bg-surface/50 border-outline-variant hover:bg-surface-container/80'}`}
               style={{ borderColor: isActive ? scenario.themeColor : undefined }}
             >
               <div>
                 <div className="flex justify-between items-start mb-3">
-                  <div className={`p-2 rounded-xl ${isActive ? '' : 'bg-[#1e293b]/50'}`} style={{ backgroundColor: isActive ? `${scenario.themeColor}33` : undefined }}>
-                    <Icon size={16} className={isActive ? '' : 'text-slate-400'} style={{ color: isActive ? scenario.themeColor : undefined }} />
+                  <div className={`p-2 rounded-xl ${isActive ? '' : 'bg-surface-container'}`} style={{ backgroundColor: isActive ? `${scenario.themeColor}33` : undefined }}>
+                    <Icon size={16} className={isActive ? '' : 'text-outline'} style={{ color: isActive ? scenario.themeColor : undefined }} />
                   </div>
                   <span className={`text-xs font-bold ${scenario.riskColor}`}>{scenario.riskLevel}</span>
                 </div>
-                <h3 className="font-bold text-slate-100 text-sm mb-2">{scenario.title}</h3>
-                <p className="text-xs text-slate-400 line-clamp-3">{scenario.description.replace(/\{currency\}([\d,]+)/g, (m, num) => formatCurrency(parseFloat(num.replace(/,/g,'')))).replace(/([\d,]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g,''))))}</p>
+                <h3 className="font-bold text-on-background text-sm mb-2">{scenario.title}</h3>
+                <p className="text-xs text-outline line-clamp-3">{scenario.description.replace(/\{currency\}([\d,]+)/g, (m, num) => formatCurrency(parseFloat(num.replace(/,/g,'')))).replace(/([\d,]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g,''))))}</p>
               </div>
               <div className="mt-4 flex justify-between items-end">
-                <span className="text-xs text-white0">Cost:</span>
+                <span className="text-xs text-on-surface">Cost:</span>
                 <span className={`text-xs font-bold ${scenario.costChangeColor}`}>{scenario.costChange}</span>
               </div>
             </div>
@@ -190,24 +190,24 @@ export default function ScenariosPage() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
         {/* Bar Chart */}
-        <Card className="bg-[#0f172a] border-slate-800/50 xl:col-span-2 flex flex-col">
-          <CardHeader className="flex flex-row items-start justify-between pb-2 border-b border-slate-800/50">
+        <Card className="bg-surface border-outline-variant xl:col-span-2 flex flex-col">
+          <CardHeader className="flex flex-row items-start justify-between pb-2 border-b border-outline-variant">
             <div>
-              <CardTitle className="text-base text-slate-200">Baseline vs. {activeScenario.title}</CardTitle>
-              <p className="text-xs text-white0 font-normal mt-1">Side-by-side financial, fuel, and ecological variance</p>
+              <CardTitle className="text-base text-on-surface">Baseline vs. {activeScenario.title}</CardTitle>
+              <p className="text-xs text-on-surface font-normal mt-1">Side-by-side financial, fuel, and ecological variance</p>
             </div>
             <div className="text-sm font-bold">
-              <span className="text-slate-400 font-normal">Risk: </span>
+              <span className="text-outline font-normal">Risk: </span>
               <span className={activeScenario.riskColor}>{activeScenario.riskLevel.split(' ')[0]}</span>
             </div>
           </CardHeader>
           <CardContent className="pt-6 flex-1 min-h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={activeScenario.chartData} margin={{ top: 20, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.4} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} opacity={0.4} />
                 <XAxis dataKey="metric" stroke="#94a3b8" tick={{fontSize: 12}} tickMargin={10} axisLine={false} tickLine={false} />
                 <YAxis stroke="#94a3b8" tick={{fontSize: 12}} axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomTooltip />} cursor={{fill: '#1e293b', opacity: 0.4}} />
+                <Tooltip content={<CustomTooltip />} cursor={{fill: '#e2e8f0', opacity: 0.4}} />
                 <Legend iconType="square" wrapperStyle={{ paddingTop: '20px' }} />
                 <Bar dataKey="base" name="Base Case" fill="#64748b" radius={[4, 4, 0, 0]} maxBarSize={60} />
                 <Bar dataKey="scenario" name={activeScenario.title} fill={activeScenario.themeColor} radius={[4, 4, 0, 0]} maxBarSize={60} />
@@ -217,9 +217,9 @@ export default function ScenariosPage() {
         </Card>
 
         {/* Text Panel */}
-        <Card className="bg-[#0f172a] border-slate-800/50 flex flex-col">
-          <CardHeader className="border-b border-slate-800/50 pb-4">
-            <CardTitle className="text-base text-slate-200 flex items-center gap-2">
+        <Card className="bg-surface border-outline-variant flex flex-col">
+          <CardHeader className="border-b border-outline-variant pb-4">
+            <CardTitle className="text-base text-on-surface flex items-center gap-2">
               <Sparkles size={18} className="text-amber-400" /> Strategic Optimization Response
             </CardTitle>
           </CardHeader>
@@ -228,22 +228,22 @@ export default function ScenariosPage() {
               
               <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
                 <h4 className="text-amber-500 font-bold text-sm mb-2">Active Mitigation Protocol:</h4>
-                <p className="text-sm text-slate-300 leading-relaxed">
+                <p className="text-sm text-on-surface-variant leading-relaxed">
                   {activeScenario.mitigation}
                 </p>
               </div>
 
               <div>
-                <h4 className="text-slate-200 font-bold text-sm mb-2">Critical Load Security Assessment:</h4>
-                <p className="text-sm text-slate-400 leading-relaxed">
+                <h4 className="text-on-surface font-bold text-sm mb-2">Critical Load Security Assessment:</h4>
+                <p className="text-sm text-outline leading-relaxed">
                   {activeScenario.assessment.replace(/\{currency\}([\d,]+)/g, (m, num) => formatCurrency(parseFloat(num.replace(/,/g,'')))).replace(/([\d,]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g,''))))}
                 </p>
               </div>
 
             </div>
 
-            <div className="mt-8 pt-4 border-t border-slate-800/50 flex justify-between items-center text-xs">
-              <span className="text-white0">Simulation engine: Mixed-Integer Heuristic</span>
+            <div className="mt-8 pt-4 border-t border-outline-variant flex justify-between items-center text-xs">
+              <span className="text-on-surface">Simulation engine: Mixed-Integer Heuristic</span>
               <span className="text-emerald-500 font-bold">Stable Solution</span>
             </div>
           </CardContent>
@@ -253,3 +253,4 @@ export default function ScenariosPage() {
     </div>
   );
 }
+

@@ -3,7 +3,7 @@
 import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, Activity } from 'lucide-react';
 
 const REPORT_DATA = {
   daily: {
@@ -94,7 +94,7 @@ export default function ReportsPage() {
     
     activeData.table.forEach(row => {
       // Clean up text if needed and join with commas
-      const rowString = `${row.asset},${formatPower(parseFloat(row.cap.replace(/[^0-9.-]+/g,"")))},${row.energy},${row.cf},${row.avail},${row.status}`;
+      const rowString = `${row.asset},${row.cap.includes("{powerScale}") ? row.cap.replace(/([\d,.-]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g,'')))) : row.cap},${row.energy},${row.cf},${row.avail},${row.status}`;
       csvContent += rowString + "\n";
     });
 
@@ -117,33 +117,33 @@ export default function ReportsPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold tracking-tight text-white">Executive Energy & ESG Reports</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-on-surface">Executive Energy & ESG Reports</h2>
             <span className="px-2 py-1 bg-emerald-500/20 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/30">
               Audit Compliant
             </span>
           </div>
-          <p className="text-slate-400 mt-1 text-sm">Automated operational dispatch summaries, financial fuel audits, and sustainability reporting</p>
+          <p className="text-outline mt-1 text-sm">Automated operational dispatch summaries, financial fuel audits, and sustainability reporting</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={exportPDF} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-medium text-sm transition-colors shadow-lg shadow-emerald-900/20">
+          <button onClick={exportPDF} className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-on-surface rounded-xl font-medium text-sm transition-colors shadow-lg shadow-emerald-900/20">
             <Download size={16} /> Export PDF
           </button>
-          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 bg-[#1e293b]/50 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium text-sm transition-colors">
+          <button onClick={exportCSV} className="flex items-center gap-2 px-4 py-2 bg-surface-container hover:bg-slate-700 text-on-surface border border-outline rounded-xl font-medium text-sm transition-colors">
             <FileText size={16} /> Export CSV
           </button>
         </div>
       </div>
 
       {/* Tabs Menu - Hidden during PDF print */}
-      <div className="flex gap-6 border-b border-slate-800/50 pb-2 print:hidden overflow-x-auto">
+      <div className="flex gap-6 border-b border-outline-variant pb-2 print:hidden overflow-x-auto">
         {(Object.keys(REPORT_DATA) as TabKey[]).map((key) => (
           <button 
             key={key}
             onClick={() => setActiveTab(key)}
             className={`text-sm font-bold pb-2 whitespace-nowrap transition-colors ${
               activeTab === key 
-                ? "text-white border-b-2 border-emerald-500" 
-                : "text-slate-400 hover:text-slate-200 border-b-2 border-transparent"
+                ? "text-on-surface border-b-2 border-emerald-500" 
+                : "text-outline hover:text-on-surface border-b-2 border-transparent"
             }`}
           >
             {REPORT_DATA[key].label}
@@ -152,88 +152,123 @@ export default function ReportsPage() {
       </div>
 
       {/* Printable Report Document */}
-      <div className="bg-[#0f172a] rounded-xl border border-slate-800/50 p-8 shadow-2xl relative print:bg-[#0f172a] print:text-black print:border-none print:shadow-none print:p-0">
+      <div className="bg-surface rounded-xl border border-outline-variant shadow-2xl relative overflow-hidden print:bg-white print:text-black print:border-none print:shadow-none print:m-0 print:p-0">
         
-        {/* Document Header */}
-        <div className="flex justify-between items-start mb-10">
-          <div>
-            <div className="text-[10px] font-bold tracking-widest text-emerald-500 uppercase mb-2">Gridwise Microgrid Intelligence System</div>
-            <h1 className="text-2xl font-bold text-white mb-1 print:text-white">{activeData.title}</h1>
-            <p className="text-sm text-slate-400 print:text-slate-300">Facility: Kutch Rural Microgrid (Dhordo, Gujarat)</p>
-          </div>
-          <div className="text-right">
-            <div className="text-xs text-slate-400 mb-1 print:text-white0">Report Ref: {activeData.ref}</div>
-            <div className="text-xs text-slate-400 mb-2 print:text-white0">Generated: 12 September 2026</div>
-            <div className="inline-block px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider rounded border border-emerald-500/20">
-              Verified
+        {/* Subtle Watermark (Visible on screen and print) */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] print:opacity-[0.05]">
+          <Activity size={400} className="text-on-surface print:text-black" />
+        </div>
+
+        {/* Official Header Strip */}
+        <div className="h-2 w-full bg-emerald-500 print:bg-emerald-700"></div>
+
+        <div className="p-8 md:p-12 relative z-10">
+          {/* Document Header */}
+          <div className="flex flex-col md:flex-row justify-between items-start border-b-2 border-outline-variant pb-8 mb-8 print:border-slate-300">
+            <div className="flex gap-4 items-start">
+              <div className="p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20 print:bg-transparent print:border-slate-300">
+                <Activity size={32} className="text-emerald-500 print:text-emerald-700" />
+              </div>
+              <div>
+                <div className="text-[10px] font-bold tracking-widest text-emerald-500 uppercase mb-1 print:text-emerald-700">Gridwise Microgrid Intelligence System</div>
+                <h1 className="text-3xl font-extrabold text-on-surface mb-2 print:text-black tracking-tight">{activeData.title}</h1>
+                <p className="text-sm font-medium text-outline print:text-slate-600">Facility: Kutch Rural Microgrid (Dhordo, Gujarat)</p>
+              </div>
+            </div>
+            
+            <div className="mt-6 md:mt-0 text-left md:text-right flex flex-col justify-end h-full">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs mb-3">
+                <span className="text-outline print:text-slate-500 text-right">Report Ref:</span>
+                <span className="font-mono text-on-surface print:text-black font-bold">{activeData.ref}</span>
+                <span className="text-outline print:text-slate-500 text-right">Generated:</span>
+                <span className="font-mono text-on-surface print:text-black font-bold">12 Sep 2026</span>
+                <span className="text-outline print:text-slate-500 text-right">Status:</span>
+                <span className="font-mono text-emerald-500 print:text-emerald-700 font-bold">VERIFIED</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* KPI Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-slate-800/50 print:bg-[#1e293b]/50 print:border-slate-800/50">
-            <div className="text-xs text-slate-400 mb-2 print:text-white0">Total Generation</div>
-            <div className="text-2xl font-bold text-white print:text-white mb-1">{activeData.generation} <span className="text-sm font-normal text-slate-300 print:text-white0">kWh</span></div>
-            <div className="text-xs text-emerald-500 font-medium">91.2% Renewable</div>
+          {/* KPI Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div className="bg-surface-container/50 p-5 rounded-xl border border-outline-variant/50 print:bg-slate-50 print:border-slate-200">
+              <div className="text-xs font-semibold text-outline uppercase tracking-wider mb-2 print:text-slate-500">Total Generation</div>
+              <div className="text-3xl font-black text-on-surface print:text-black mb-1">{activeData.generation} <span className="text-base font-normal text-on-surface-variant print:text-slate-500">kWh</span></div>
+              <div className="text-xs text-emerald-500 font-bold">91.2% Renewable</div>
+            </div>
+            <div className="bg-surface-container/50 p-5 rounded-xl border border-outline-variant/50 print:bg-slate-50 print:border-slate-200">
+              <div className="text-xs font-semibold text-outline uppercase tracking-wider mb-2 print:text-slate-500">Operating Cost</div>
+              <div className="text-3xl font-black text-emerald-500 print:text-emerald-700 mb-1">{formatCurrency(parseFloat(activeData.cost.replace(/[^0-9.-]+/g,"")))}</div>
+              <div className="text-xs text-emerald-500 font-bold">Saved {formatCurrency(parseFloat(activeData.saved.replace(/[^0-9.-]+/g,"")))}</div>
+            </div>
+            <div className="bg-surface-container/50 p-5 rounded-xl border border-outline-variant/50 print:bg-slate-50 print:border-slate-200">
+              <div className="text-xs font-semibold text-outline uppercase tracking-wider mb-2 print:text-slate-500">Diesel Displaced</div>
+              <div className="text-3xl font-black text-amber-500 print:text-amber-700 mb-1">{activeData.diesel} <span className="text-base font-normal text-amber-500/70 print:text-slate-500">Litres</span></div>
+              <div className="text-xs text-on-surface print:text-slate-700 font-bold">43% reduction</div>
+            </div>
+            <div className="bg-surface-container/50 p-5 rounded-xl border border-outline-variant/50 print:bg-slate-50 print:border-slate-200">
+              <div className="text-xs font-semibold text-outline uppercase tracking-wider mb-2 print:text-slate-500">CO₂ Abated</div>
+              <div className="text-3xl font-black text-cyan-400 print:text-cyan-700 mb-1">{activeData.co2} <span className="text-base font-normal text-cyan-400/70 print:text-slate-500">kg</span></div>
+              <div className="text-xs text-emerald-500 font-bold">100% clinic uptime</div>
+            </div>
           </div>
-          <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-slate-800/50 print:bg-[#1e293b]/50 print:border-slate-800/50">
-            <div className="text-xs text-slate-400 mb-2 print:text-white0">Operating Cost</div>
-            <div className="text-2xl font-bold text-emerald-500 print:text-emerald-600 mb-1">{formatCurrency(parseFloat(activeData.cost.replace(/[^0-9.-]+/g,"")))}</div>
-            <div className="text-xs text-emerald-500 font-medium">Saved {formatCurrency(parseFloat(activeData.saved.replace(/[^0-9.-]+/g,"")))}</div>
-          </div>
-          <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-slate-800/50 print:bg-[#1e293b]/50 print:border-slate-800/50">
-            <div className="text-xs text-slate-400 mb-2 print:text-white0">Diesel Displaced</div>
-            <div className="text-2xl font-bold text-amber-500 print:text-amber-600 mb-1">{activeData.diesel} <span className="text-sm font-normal text-amber-500/70">Litres</span></div>
-            <div className="text-xs text-white0 font-medium">43% reduction</div>
-          </div>
-          <div className="bg-[#0f172a]/50 p-4 rounded-xl border border-slate-800/50 print:bg-[#1e293b]/50 print:border-slate-800/50">
-            <div className="text-xs text-slate-400 mb-2 print:text-white0">CO₂ Abated</div>
-            <div className="text-2xl font-bold text-cyan-400 print:text-cyan-600 mb-1">{activeData.co2} <span className="text-sm font-normal text-cyan-400/70">kg</span></div>
-            <div className="text-xs text-emerald-500 font-medium">100% clinic uptime</div>
-          </div>
-        </div>
 
-        {/* Data Table */}
-        <div className="mb-10">
-          <h3 className="text-xs font-bold tracking-widest text-white uppercase mb-4 print:text-white">Subsystem Dispatch Performance</h3>
-          <div className="overflow-hidden rounded-xl border border-slate-800/50 print:border-slate-700">
-            <table className="w-full text-sm text-left">
-              <thead className="text-xs text-slate-400 uppercase bg-[#0f172a]/50 border-b border-slate-800/50 print:bg-[#1e293b] print:text-white0 print:border-slate-700">
-                <tr>
-                  <th className="px-6 py-4 font-medium">Asset</th>
-                  <th className="px-6 py-4 font-medium">Capacity</th>
-                  <th className="px-6 py-4 font-medium">Energy Delivered</th>
-                  <th className="px-6 py-4 font-medium">Capacity Factor</th>
-                  <th className="px-6 py-4 font-medium">Availability</th>
-                  <th className="px-6 py-4 font-medium text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800 print:divide-slate-200 bg-slate-950 text-slate-300 print:text-slate-300">
-                {activeData.table.map((row, idx) => (
-                  <tr key={idx}>
-                    <td className="px-6 py-4 font-medium text-white print:text-white">{row.asset}</td>
-                    <td className="px-6 py-4">{row.cap}</td>
-                    <td className="px-6 py-4 text-slate-300 print:text-slate-300">{row.energy}</td>
-                    <td className="px-6 py-4">{row.cf}</td>
-                    <td className="px-6 py-4 text-emerald-500 font-medium">{row.avail}</td>
-                    <td className={`px-6 py-4 text-right ${row.statusColor}`}>{row.status}</td>
+          {/* Data Table */}
+          <div className="mb-10">
+            <h3 className="text-xs font-bold tracking-widest text-on-surface uppercase mb-4 print:text-slate-800 border-b border-outline-variant print:border-slate-300 pb-2">Subsystem Dispatch Performance</h3>
+            <div className="overflow-hidden rounded-lg border border-outline-variant print:border-slate-300 print:rounded-none">
+              <table className="w-full text-sm text-left">
+                <thead className="text-[11px] text-outline uppercase bg-surface-container print:bg-slate-100 print:text-slate-600 border-b border-outline-variant print:border-slate-300 font-bold tracking-wider">
+                  <tr>
+                    <th className="px-6 py-4">Asset</th>
+                    <th className="px-6 py-4">Capacity</th>
+                    <th className="px-6 py-4">Energy Delivered</th>
+                    <th className="px-6 py-4">Capacity Factor</th>
+                    <th className="px-6 py-4">Availability</th>
+                    <th className="px-6 py-4 text-right">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-outline-variant/50 print:divide-slate-200 bg-background/50 print:bg-white text-on-surface-variant print:text-slate-700">
+                  {activeData.table.map((row, idx) => (
+                    <tr key={idx} className="hover:bg-surface-container/30 transition-colors print:hover:bg-white">
+                      <td className="px-6 py-4 font-bold text-on-surface print:text-black">{row.asset}</td>
+                      <td className="px-6 py-4">{row.cap.replace('{powerScale}', powerScale)}</td>
+                      <td className="px-6 py-4 text-on-surface print:text-slate-900 font-mono">{row.energy}</td>
+                      <td className="px-6 py-4">{row.cf}</td>
+                      <td className="px-6 py-4 text-emerald-500 print:text-emerald-700 font-bold">{row.avail}</td>
+                      <td className={`px-6 py-4 text-right font-bold ${row.statusColor.replace('print:text-cyan-600', 'print:text-cyan-800').replace('print:text-emerald-600', 'print:text-emerald-800')}`}>{row.status}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-        {/* Observations Footer */}
-        <div className="bg-[#0f172a]/30 p-6 rounded-xl border border-slate-800/50 print:bg-slate-950 print:border-slate-700">
-          <h4 className="text-sm font-bold text-white mb-2 print:text-white">Auditor & System Observations:</h4>
-          <p className="text-sm text-slate-400 leading-relaxed print:text-slate-300">
-            {activeData.observations}
-          </p>
-        </div>
+          {/* Observations & Signatures */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t-2 border-outline-variant print:border-slate-300">
+            <div className="md:col-span-2">
+              <h4 className="text-xs font-bold tracking-widest text-on-surface uppercase mb-3 print:text-slate-800">Auditor & System Observations</h4>
+              <p className="text-sm text-outline print:text-slate-600 leading-relaxed text-justify">
+                {activeData.observations}
+              </p>
+            </div>
+            
+            <div className="md:col-span-1 flex flex-col justify-end space-y-6">
+              <div className="border-b border-outline print:border-slate-400 pb-2">
+                <span className="text-[10px] text-outline print:text-slate-500 uppercase tracking-wider font-bold">Authorized By</span>
+                <div className="font-signature text-2xl mt-4 text-on-surface print:text-black opacity-80" style={{ fontFamily: "'Dancing Script', cursive, serif" }}>Gridwise AI Auditor</div>
+              </div>
+              <div className="border-b border-outline print:border-slate-400 pb-2">
+                <span className="text-[10px] text-outline print:text-slate-500 uppercase tracking-wider font-bold">Timestamp & Hash</span>
+                <div className="font-mono text-[10px] mt-2 text-on-surface-variant print:text-slate-500 break-all">
+                  0x7A9B...4F21 (Immutable Ledger Record)
+                </div>
+              </div>
+            </div>
+          </div>
 
+        </div>
       </div>
     </div>
   );
 }
+

@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
-import { Inter, IBM_Plex_Mono, IBM_Plex_Serif } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: '--font-sans' });
-const plexMono = IBM_Plex_Mono({ weight: ['400', '500', '600', '700'], subsets: ["latin"], variable: '--font-mono' });
-const plexSerif = IBM_Plex_Serif({ weight: ['400', '500', '600', '700'], subsets: ["latin"], variable: '--font-serif' });
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "Microgrid Energy Intelligence",
-  description: "Advanced Microgrid Operations and Intelligence Platform",
+  title: "Microgrid Telemetry",
+  description: "Advanced Microgrid Control Dashboard",
 };
 
 
@@ -142,7 +148,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${plexMono.variable} ${plexSerif.variable} bg-slate-950 font-sans text-slate-50 antialiased`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased bg-background text-on-background font-sans min-h-screen`}>
         {children}
       </body>
     </html>

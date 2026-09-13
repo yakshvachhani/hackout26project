@@ -216,19 +216,6 @@ def get_dispatch():
         })
     return res
 
-@app.get('/api/analytics')
-def get_analytics():
-    res = []
-    import random
-    for i in range(30):
-        res.append({
-            'day': f"Day {i+1}",
-            'uptime': round(98 + random.random() * 2, 1),
-            'renewablePenetration': round(60 + random.random() * 30, 1),
-            'dieselDependency': round(10 + random.random() * 15, 1)
-        })
-    return res
-
 @app.get('/api/cost')
 def get_cost():
     return [
@@ -242,9 +229,9 @@ def get_cost():
     ]
 
 @app.get('/api/analytics')
-def get_analytics_db(db: Session = Depends(get_db)):
+def get_analytics_db(days: int = 30, db: Session = Depends(get_db)):
     from models import DailyLog
-    logs = db.query(DailyLog).order_by(DailyLog.date.asc()).limit(30).all()
+    logs = db.query(DailyLog).order_by(DailyLog.date.asc()).limit(days).all()
     res = []
     for i, log in enumerate(logs):
         res.append({
