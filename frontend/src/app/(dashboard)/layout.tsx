@@ -4,27 +4,28 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  LayoutDashboard, Activity, CloudRain, Sun, 
-  Battery, Droplet, DollarSign, BarChart3, 
-  Settings, Bell, AlertTriangle, Menu, User, Map, FileText, ChevronRight
+  LayoutDashboard, Activity, CloudSun, Sun, 
+  Battery, BatteryCharging, DollarSign, BarChart3, 
+  Settings, Bell, AlertTriangle, Menu, User, Map, FileText, ChevronRight,
+  CloudRain, Users, Wind, Layers, Cpu, Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils'; // We need a simple utils file for clsx
 
 const NAV_ITEMS = [
-  { name: 'Overview', href: '/', icon: LayoutDashboard },
+  { name: 'System Overview', href: '/', icon: LayoutDashboard },
   { name: 'Live Dispatch', href: '/dispatch', icon: Activity },
-  { name: 'Forecasts', href: '/forecast', icon: CloudRain },
-  { name: 'Optimizer', href: '/optimizer', icon: Sun },
-  { name: 'Energy Assets', href: '/assets', icon: Battery },
-  { name: 'Battery', href: '/battery', icon: Battery },
-  { name: 'Demand', href: '/demand', icon: Droplet },
-  { name: 'Weather', href: '/weather', icon: CloudRain },
-  { name: 'Cost & Emissions', href: '/cost', icon: DollarSign },
+  { name: 'Renewable Forecasts', href: '/forecast', icon: CloudSun },
+  { name: 'AI Grid Optimizer', href: '/optimizer', icon: Cpu },
+  { name: 'Energy Assets', href: '/assets', icon: Layers },
+  { name: 'BESS Storage', href: '/battery', icon: BatteryCharging },
+  { name: 'Community Demand', href: '/demand', icon: Users },
+  { name: 'Weather Intelligence', href: '/weather', icon: Wind },
+  { name: 'Economics & Carbon', href: '/cost', icon: DollarSign },
   { name: 'Historical Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Alerts', href: '/alerts', icon: Bell },
-  { name: 'Scenarios', href: '/scenarios', icon: AlertTriangle },
-  { name: 'Reports', href: '/reports', icon: FileText },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'System Alerts', href: '/alerts', icon: Bell },
+  { name: 'Crisis Scenarios', href: '/scenarios', icon: AlertTriangle },
+  { name: 'Operational Reports', href: '/reports', icon: FileText },
+  { name: 'System Settings', href: '/settings', icon: Settings },
 ];
 
 import { SettingsProvider, useSettings } from '@/contexts/SettingsContext';
@@ -125,7 +126,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           isSidebarOpen ? "w-64" : "w-16"
         )}>
           <div className="flex h-14 items-center justify-between px-4 border-b border-outline-variant">
-            {isSidebarOpen && <span className="font-bold tracking-tight text-emerald-400">GRIDWISE</span>}
+            {isSidebarOpen && (
+              <div className="flex items-center gap-2">
+                <Zap size={18} className="text-emerald-400 fill-emerald-400/20" />
+                <span className="font-bold tracking-tight text-emerald-400 text-base">OptiGrid-AI</span>
+              </div>
+            )}
             <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-1 hover:bg-surface-container rounded">
               <Menu size={20} />
             </button>
