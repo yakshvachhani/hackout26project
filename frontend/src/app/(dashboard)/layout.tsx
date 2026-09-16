@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, Activity, CloudSun, Sun, 
-  Battery, BatteryCharging, DollarSign, BarChart3, 
+import {
+  LayoutDashboard, Activity, CloudSun, Sun,
+  Battery, BatteryCharging, DollarSign, BarChart3,
   Settings, Bell, AlertTriangle, Menu, User, Map, FileText, ChevronRight,
   CloudRain, Users, Wind, Layers, Cpu, Zap
 } from 'lucide-react';
@@ -33,8 +33,8 @@ import { SettingsProvider, useSettings } from '@/contexts/SettingsContext';
 function LocationSelector() {
   const settings = useSettings();
   return (
-    <select 
-      value={settings.locationId || 'dhordo'} 
+    <select
+      value={settings.locationId || 'dhordo'}
       onChange={(e) => settings.setSettings({ locationId: e.target.value })}
       className="bg-transparent font-medium text-sm text-on-background focus:outline-none appearance-none cursor-pointer"
     >
@@ -49,12 +49,12 @@ function LocationSelector() {
 
 function LiveWeatherWidget() {
   const { locationId } = useSettings();
-  const [weather, setWeather] = useState<{temp: number, rad: number} | null>(null);
+  const [weather, setWeather] = useState<{ temp: number, rad: number } | null>(null);
 
   React.useEffect(() => {
     let solarScale = 1.0;
     let tempOffset = 0;
-    
+
     if (locationId === 'spiti') { solarScale = 0.6; tempOffset = -15; }
     else if (locationId === 'jaisalmer') { solarScale = 1.5; tempOffset = 12; }
     else if (locationId === 'sundarbans') { solarScale = 1.2; tempOffset = 4; }
@@ -84,9 +84,9 @@ function LiveWeatherWidget() {
           const finalRad = typeof rad === 'number' ? rad : 162.6;
           const finalTemp = typeof temp === 'number' ? temp : 28.6;
 
-          setWeather({ 
-            temp: finalTemp + tempOffset, 
-            rad: finalRad * solarScale 
+          setWeather({
+            temp: finalTemp + tempOffset,
+            rad: finalRad * solarScale
           });
         }
       })
@@ -175,17 +175,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span className="text-xs text-outline border-l border-outline pl-2 ml-1">4s ago</span>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <LiveWeatherWidget />
               <div className="flex items-center bg-surface-container rounded-lg p-1 border border-outline-variant">
-                <button 
+                <button
                   className={cn("px-3 py-1 text-xs font-semibold rounded-md transition-all", mode === 'SIMULATION' ? "bg-surface text-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface")}
                   onClick={() => setMode('SIMULATION')}
                 >
                   Sim Mode
                 </button>
-                <button 
+                <button
                   className={cn("px-3 py-1 text-xs font-semibold rounded-md transition-all", mode === 'LIVE' ? "bg-surface text-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface")}
                   onClick={() => setMode('LIVE')}
                 >

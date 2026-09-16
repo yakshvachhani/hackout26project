@@ -10,7 +10,7 @@ import {
 import { Activity, Sun, Wind, Battery, Droplet, Zap, ShieldAlert } from 'lucide-react';
 
 export default function DispatchPage() {
-  const { currency, powerScale, formatPower } = useSettings();
+  const { currency, powerScale, formatPower, mode, simScenario } = useSettings();
   const [data, setData] = useState<any[]>([]);
   const [liveData, setLiveData] = useState({
     solar: 1800,
@@ -24,17 +24,24 @@ export default function DispatchPage() {
   const [timeRange, setTimeRange] = useState(24);
 
   useEffect(() => {
-    // Generate initial 24h data
+    // Generate initial 24h data based on mode and scenario
     const initial = [];
     const now = new Date();
     for(let i = 24; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 60 * 60 * 1000);
       const hour = d.getHours();
       
-      let s = (hour > 6 && hour < 19) ? Math.sin((hour - 6) / 13 * Math.PI) * 180 : 0;
-      const baseLoad = 80;
+      let solarPeak = 180;
+      if (mode === 'SIMULATION' && simScenario === 'solar_drop') {
+        solarPeak = 55; // attenuated
+      }
+      let s = (hour > 6 && hour < 19) ? Math.sin((hour - 6) / 13 * Math.PI) * solarPeak : 0;
+      let baseLoad = 80;
+      if (mode === 'SIMULATION' && simScenario === 'demand_spike') {
+        baseLoad = 115; // surge
+      }
       const morningPeak = hour >= 7 && hour <= 10 ? 40 : 0;
-      const eveningPeak = hour >= 18 && hour <= 22 ? 60 : 0;
+      const eveningPeak = hour >= 18 && hour <= 22 ? (mode === 'SIMULATION' && simScenario === 'demand_spike' ? 85 : 60) : 0;
       const demand = baseLoad + morningPeak + eveningPeak + Math.random() * 10;
       const w = 20 + Math.random() * 30;
       
@@ -47,9 +54,15 @@ export default function DispatchPage() {
         batteryCharge = Math.min(gen - demand, 50); // cap charging
       } else if (gen < demand) {
         const deficit = demand - gen;
-        batteryDischarge = Math.min(deficit, 60);
-        if (deficit > 60) {
-          diesel = deficit - 60;
+        if (mode === 'SIMULATION' && simScenario === 'generator_failure') {
+          // Generator tripped: BESS takes full deficit
+          batteryDischarge = Math.min(deficit, 100);
+          diesel = 0;
+        } else {
+          batteryDischarge = Math.min(deficit, 60);
+          if (deficit > 60) {
+            diesel = deficit - 60;
+          }
         }
       }
 
@@ -61,7 +74,7 @@ export default function DispatchPage() {
         batteryCharge: -batteryCharge * 1000,
         diesel: diesel * 1000,
         demand: demand * 1000,
-        reserveMargin: (250 + 100 + 500) * 1000 - (demand * 1000), // simplistic reserve
+        reserveMargin: Math.max(0, (250 + 100 + 500) * 1000 - (demand * 1000)),
         availableSolar: (s + 20) * 1000,
         curtailedEnergy: batteryCharge === 50 ? (gen - demand - 50) * 1000 : 0,
         curtailmentRate: batteryCharge === 50 ? 5 : 0
@@ -95,8 +108,13 @@ export default function DispatchPage() {
         } else {
           last.batteryCharge = 0;
           const deficit = last.demand - gen;
-          last.batteryDischarge = Math.min(deficit, 60000);
-          last.diesel = deficit > 60000 ? deficit - 60000 : 0;
+          if (mode === 'SIMULATION' && simScenario === 'generator_failure') {
+            last.batteryDischarge = Math.min(deficit, 100000);
+            last.diesel = 0;
+          } else {
+            last.batteryDischarge = Math.min(deficit, 60000);
+            last.diesel = deficit > 60000 ? deficit - 60000 : 0;
+          }
         }
         
         newArr[newArr.length - 1] = last;
@@ -105,7 +123,7 @@ export default function DispatchPage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [mode, simScenario]);
 
   const displayData = data.slice(-(timeRange + 1));
 
@@ -116,9 +134,15 @@ export default function DispatchPage() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-on-surface flex items-center gap-3">
             Live Dispatch & Power Balance
-            <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
-              <Activity size={10} /> SCADA: SYNC
-            </span>
+            {mode === 'SIMULATION' ? (
+              <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 uppercase tracking-wider flex items-center gap-1 animate-pulse">
+                <ShieldAlert size={10} /> SCADA: SIMULATION INJECTION ({simScenario.toUpperCase()})
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
+                <Activity size={10} /> SCADA: SYNC
+              </span>
+            )}
           </h2>
           <p className="text-outline text-sm mt-1">Real-time multi-interval generation matching, spinning reserve verification, and curtailment tracking</p>
         </div>

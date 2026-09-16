@@ -9,6 +9,9 @@ export const LOCATIONS = [
   { id: 'jaisalmer', name: 'Jaisalmer Desert Hub (Rajasthan)', scale: 1.5 }
 ];
 
+export type GridMode = 'LIVE' | 'SIMULATION';
+export type SimScenario = 'nominal' | 'solar_drop' | 'demand_spike' | 'generator_failure';
+
 type Settings = {
   currency: string;
   powerScale: string;
@@ -18,6 +21,10 @@ type Settings = {
   dieselPrice: number;
   rates: Record<string, number>;
   locationId: string;
+  mode: GridMode;
+  simScenario: SimScenario;
+  setMode: (mode: GridMode) => void;
+  setSimScenario: (scenario: SimScenario) => void;
   setSettings: (settings: Partial<Settings>) => void;
   formatCurrency: (baseValueINR: number, decimals?: number) => string;
   formatPower: (baseValueKW: number, decimals?: number) => string;
@@ -32,6 +39,10 @@ const defaultSettings: Settings = {
   dieselPrice: 92,
   rates: { '$': 1, '₹': 83.5, '€': 0.92, '£': 0.79 },
   locationId: 'dhordo',
+  mode: 'LIVE',
+  simScenario: 'nominal',
+  setMode: () => {},
+  setSimScenario: () => {},
   setSettings: () => {},
   formatCurrency: (val) => `₹${val}`,
   formatPower: (val) => `${val} kW`,
@@ -40,7 +51,7 @@ const defaultSettings: Settings = {
 const SettingsContext = createContext<Settings>(defaultSettings);
 
 export const SettingsProvider = ({ children }: { children: React.ReactNode }) => {
-  const [settings, setSettingsState] = useState<Omit<Settings, 'setSettings' | 'formatCurrency' | 'formatPower'>>({
+  const [settings, setSettingsState] = useState<Omit<Settings, 'setSettings' | 'setMode' | 'setSimScenario' | 'formatCurrency' | 'formatPower'>>({
     currency: '₹',
     powerScale: 'kW',
     solarCap: 250,
@@ -49,15 +60,24 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     dieselPrice: 92,
     rates: { '$': 1, '₹': 83.5, '€': 0.92, '£': 0.79 },
     locationId: 'dhordo',
+    mode: 'LIVE',
+    simScenario: 'nominal',
   });
 
   useEffect(() => {
     const saved = localStorage.getItem('microgrid_settings');
+    const savedMode = localStorage.getItem('microgrid_mode') as GridMode | null;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setSettingsState(prev => ({ ...prev, ...parsed }));
+        setSettingsState(prev => ({ 
+          ...prev, 
+          ...parsed,
+          ...(savedMode ? { mode: savedMode } : {})
+        }));
       } catch (e) {}
+    } else if (savedMode) {
+      setSettingsState(prev => ({ ...prev, mode: savedMode }));
     }
 
     // Fetch live exchange rates and live diesel price in parallel
@@ -65,7 +85,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
       fetch('https://open.er-api.com/v6/latest/USD').then(res => res.json()).catch(() => null),
       fetch('https://www.fueleconomy.gov/ws/rest/fuelprices').then(res => res.text()).catch(() => null)
     ]).then(([ratesData, fuelText]) => {
-      let newRates = { '$': 1, '₹': 83.5, '€': 0.92, '£': 0.79 };
+      let newRates: Record<string, number> = { '$': 1, '₹': 83.5, '€': 0.92, '£': 0.79 };
       if (ratesData && ratesData.rates) {
         newRates = {
           '$': 1,
@@ -103,6 +123,19 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
     });
   }, []);
 
+  const setMode = (mode: GridMode) => {
+    setSettingsState(prev => {
+      try {
+        localStorage.setItem('microgrid_mode', mode);
+      } catch (e) {}
+      return { ...prev, mode };
+    });
+  };
+
+  const setSimScenario = (simScenario: SimScenario) => {
+    setSettingsState(prev => ({ ...prev, simScenario }));
+  };
+
   const setSettings = (newSettings: Partial<Settings>) => {
     setSettingsState(prev => {
       const next = { ...prev, ...newSettings };
@@ -139,7 +172,7 @@ export const SettingsProvider = ({ children }: { children: React.ReactNode }) =>
   };
 
   return (
-    <SettingsContext.Provider value={{ ...settings, setSettings, formatCurrency, formatPower }}>
+    <SettingsContext.Provider value={{ ...settings, setSettings, setMode, setSimScenario, formatCurrency, formatPower }}>
       {children}
     </SettingsContext.Provider>
   );

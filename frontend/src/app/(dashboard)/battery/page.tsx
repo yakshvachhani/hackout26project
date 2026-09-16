@@ -13,8 +13,54 @@ export default function BatteryIntelligencePage() {
   const [isDischarging, setIsDischarging] = useState(true);
 
   // API Data states
-  const [socData, setSocData] = useState<any[]>([]);
-  const [inverterData, setInverterData] = useState<any[]>([]);
+  // 24h SOC Curve Generator (Respects 20% floor & 95% ceiling)
+  const generateDefaultSocCurve = () => {
+    const curve = [];
+    for (let i = 0; i < 24; i++) {
+      const hourStr = `${i.toString().padStart(2, '0')}:00`;
+      let val = 60;
+      if (i <= 6) {
+        // Night: steady discharge from 68% down to 42% (above 20% floor)
+        val = 68 - (i * 4.1);
+      } else if (i <= 14) {
+        // Daytime: solar absorption up to 92%
+        val = 43 + ((i - 6) * 6.1);
+      } else if (i <= 17) {
+        // Late afternoon float
+        val = 92 - ((i - 14) * 1.5);
+      } else {
+        // Evening peak demand discharge
+        val = 87 - ((i - 17) * 3.1);
+      }
+      curve.push({
+        time: hourStr,
+        soc: Number(Math.max(24, Math.min(94, val)).toFixed(1))
+      });
+    }
+    return curve;
+  };
+
+  // 24h Inverter Curve Generator (Positive = discharge, Negative = charge)
+  const generateDefaultInverterCurve = () => {
+    const curve = [];
+    for (let i = 0; i < 24; i++) {
+      const hourStr = `${i.toString().padStart(2, '0')}:00`;
+      let p = 0;
+      if (i >= 8 && i <= 15) {
+        p = -Number((15 + Math.sin((i - 8) / 7 * Math.PI) * 28).toFixed(1)); // charging
+      } else if (i >= 18 && i <= 22) {
+        p = Number((22 + Math.sin((i - 18) / 4 * Math.PI) * 26).toFixed(1)); // discharging
+      } else {
+        p = Number((6 + (i % 3) * 1.5).toFixed(1)); // baseline
+      }
+      curve.push({ time: hourStr, power: p });
+    }
+    return curve;
+  };
+
+  // API Data states initialized with default 24h curves so never empty
+  const [socData, setSocData] = useState<any[]>(generateDefaultSocCurve);
+  const [inverterData, setInverterData] = useState<any[]>(generateDefaultInverterCurve);
 
   // Projected Degradation Data
   const degradationData = [
@@ -34,33 +80,52 @@ export default function BatteryIntelligencePage() {
     const fetchData = async () => {
       try {
         const [battRes, dispRes] = await Promise.all([
-          fetch('http://localhost:8000/api/battery'),
-          fetch('http://localhost:8000/api/dispatch')
+          fetch('http://localhost:8000/api/battery').catch(() => null),
+          fetch('http://localhost:8000/api/dispatch').catch(() => null)
         ]);
-        const battJson = await battRes.json();
-        const dispJson = await dispRes.json();
 
-        // Parse Battery SOC Curve
-        if (Array.isArray(battJson)) {
-          setSocData(battJson.map((d: any) => ({
-            time: d.time,
-            soc: d.soc
-          })));
+        if (battRes && battRes.ok) {
+          const battJson = await battRes.json();
+          let parsedSoc: any[] = [];
+          const history = battJson?.socHistory || battJson?.soc_history;
+          
+          if (Array.isArray(history) && history.length > 0) {
+            parsedSoc = history.map((d: any) => ({
+              time: d.hour || d.time || `${d.interval || 0}:00`,
+              soc: Number(d.soc ?? d.socPercent ?? 50)
+            }));
+          } else if (Array.isArray(battJson) && battJson.length > 0) {
+            parsedSoc = battJson.map((d: any) => ({
+              time: d.hour || d.time || '00:00',
+              soc: Number(d.soc ?? 50)
+            }));
+          }
+
+          if (parsedSoc.length > 0) {
+            setSocData(parsedSoc);
+          }
+
+          if (battJson?.currentSocPercent) {
+            setSoc(Number(battJson.currentSocPercent));
+          }
         }
 
-        // Parse Dispatch Inverter Power (Positive = Discharge, Negative = Charge)
-        if (Array.isArray(dispJson)) {
-          setInverterData(dispJson.map((d: any) => {
-            // Reversing the sign for charging so it plots below 0
-            const discharge = d.batteryDischarge || 0;
-            const charge = d.batteryCharge || 0; 
-            // In API, batteryCharge is already negative, but let's ensure it.
-            const netPower = discharge > 0 ? discharge : (charge < 0 ? charge : -charge);
-            return {
-              time: d.time,
-              power: netPower
-            };
-          }));
+        if (dispRes && dispRes.ok) {
+          const dispJson = await dispRes.json();
+          if (Array.isArray(dispJson) && dispJson.length > 0) {
+            const parsedInverter = dispJson.map((d: any) => {
+              const discharge = Number(d.batteryDischarge || 0);
+              const charge = Number(d.batteryCharge || 0);
+              const netPower = discharge > 0 ? discharge : (charge < 0 ? charge : -charge);
+              return {
+                time: d.time || '00:00',
+                power: Number(netPower.toFixed(1))
+              };
+            });
+            if (parsedInverter.length > 0) {
+              setInverterData(parsedInverter);
+            }
+          }
         }
       } catch (err) {
         console.error("Failed to fetch battery data", err);
@@ -221,19 +286,20 @@ export default function BatteryIntelligencePage() {
           <CardContent className="flex-1 min-h-[250px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={socData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={10} minTickGap={20} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} domain={[0, 100]} tickFormatter={v => `${v}%`} />
-                <Tooltip content={<SocTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
+                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} dy={10} minTickGap={20} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} domain={[0, 100]} tickFormatter={v => `${v}%`} />
+                <Tooltip content={<SocTooltip />} cursor={{ stroke: '#64748b', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 
-                <ReferenceLine y={20} stroke="#ef4444" strokeDasharray="3 3" label={{ position: 'insideBottomRight', value: 'Reserve Floor (20%)', fill: '#ef4444', fontSize: 10 }} />
+                <ReferenceLine y={20} stroke="#ef4444" strokeWidth={1.5} strokeDasharray="3 3" label={{ position: 'insideBottomRight', value: 'Reserve Floor (20%)', fill: '#ef4444', fontSize: 10, fontWeight: 'bold' }} />
+                <ReferenceLine y={95} stroke="#38bdf8" strokeWidth={1} strokeDasharray="3 3" label={{ position: 'insideTopRight', value: 'Max Ceiling (95%)', fill: '#38bdf8', fontSize: 9 }} />
                 
-                <Area type="monotone" dataKey="soc" stroke="#10b981" fillOpacity={1} fill="url(#colorSoc)" strokeWidth={2} />
+                <Area type="monotone" dataKey="soc" stroke="#10b981" fillOpacity={1} fill="url(#colorSoc)" strokeWidth={2.5} />
                 
                 <defs>
                   <linearGradient id="colorSoc" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.35}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.02}/>
                   </linearGradient>
                 </defs>
               </AreaChart>
@@ -255,20 +321,20 @@ export default function BatteryIntelligencePage() {
           <CardContent className="flex-1 min-h-[250px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={inverterData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={10} minTickGap={20} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} domain={[-60, 100]} tickFormatter={v => `${v} kW`} />
-                <Tooltip content={<InverterTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
+                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} dy={10} minTickGap={20} />
+                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} domain={[-60, 100]} tickFormatter={v => `${v} kW`} />
+                <Tooltip content={<InverterTooltip />} cursor={{ stroke: '#64748b', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 
-                <ReferenceLine y={0} stroke="#475569" strokeOpacity={0.5} />
+                <ReferenceLine y={0} stroke="#64748b" strokeOpacity={0.6} />
                 
-                <Area type="monotone" dataKey="power" stroke="#3b82f6" fillOpacity={1} fill="url(#colorPower)" strokeWidth={2} />
+                <Area type="monotone" dataKey="power" stroke="#3b82f6" fillOpacity={1} fill="url(#colorPower)" strokeWidth={2.5} />
                 
                 <defs>
                   <linearGradient id="colorPower" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35}/>
                     <stop offset="50%" stopColor="#3b82f6" stopOpacity={0.0}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.35}/>
                   </linearGradient>
                 </defs>
               </AreaChart>
