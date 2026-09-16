@@ -15,21 +15,28 @@ export default function AnalyticsPage() {
   const [historyData, setHistoryData] = useState<any[]>([]);
 
   React.useEffect(() => {
-    // Generate data based on range locally so it updates INSTANTLY
-    let days = 30;
-    if (range === '7d') days = 7;
-    if (range === '90d') days = 90;
-
-    const data = [];
-    for (let i = 1; i <= days; i++) {
-      data.push({
-        day: `Day ${i}`,
-        uptime: parseFloat((95 + Math.random() * 5).toFixed(1)),
-        renewablePenetration: parseFloat((60 + Math.random() * 30).toFixed(1)),
-        dieselDependency: parseFloat((10 + Math.random() * 15).toFixed(1)),
+    const days = range === '7d' ? 7 : range === '90d' ? 90 : 30;
+    fetch(`http://localhost:8000/api/analytics?days=${days}`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setHistoryData(data);
+        } else {
+          throw new Error('No data');
+        }
+      })
+      .catch(() => {
+        const fallback = [];
+        for (let i = 1; i <= days; i++) {
+          fallback.push({
+            day: `Day ${i}`,
+            uptime: parseFloat((95 + Math.random() * 5).toFixed(1)),
+            renewablePenetration: parseFloat((60 + Math.random() * 30).toFixed(1)),
+            dieselDependency: parseFloat((10 + Math.random() * 15).toFixed(1)),
+          });
+        }
+        setHistoryData(fallback);
       });
-    }
-    setHistoryData(data);
   }, [range]);
 
   // Calculate dynamic KPIs from DB
@@ -42,14 +49,14 @@ export default function AnalyticsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Historical Analytics</h2>
-          <p className="text-slate-400">Performance, reliability, and uptime metrics over time.</p>
+          <p className="text-outline">Performance, reliability, and uptime metrics over time.</p>
         </div>
-        <div className="flex bg-[#1e293b]/50 rounded-md p-1">
+        <div className="flex items-center bg-surface-container rounded-lg p-1 border border-outline-variant">
           {['7d', '30d', '90d'].map((r) => (
             <button 
               key={r}
               onClick={() => setRange(r)}
-              className={`px-3 py-1 text-sm font-medium rounded ${range === r ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-slate-200'}`}
+              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${range === r ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
             >
               {r}
             </button>
@@ -58,47 +65,47 @@ export default function AnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
+        <Card className="bg-surface border-outline-variant rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">System Uptime</CardTitle>
+            <CardTitle className="text-sm font-medium text-outline">System Uptime</CardTitle>
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{avgUptime}%</div>
-            <p className="text-xs text-white0 mt-1">Over 30 days</p>
+            <div className="text-2xl font-bold text-on-surface">{avgUptime}%</div>
+            <p className="text-xs text-on-surface mt-1">Over 30 days</p>
           </CardContent>
         </Card>
         
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
+        <Card className="bg-surface border-outline-variant rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">Avg. Renewable Share</CardTitle>
+            <CardTitle className="text-sm font-medium text-outline">Avg. Renewable Share</CardTitle>
             <Sun className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{avgRenewable}%</div>
-            <p className="text-xs text-white0 mt-1">Target &gt; 80%</p>
+            <div className="text-2xl font-bold text-on-surface">{avgRenewable}%</div>
+            <p className="text-xs text-on-surface mt-1">Target &gt; 80%</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
+        <Card className="bg-surface border-outline-variant rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">Avg. Diesel Dependency</CardTitle>
+            <CardTitle className="text-sm font-medium text-outline">Avg. Diesel Dependency</CardTitle>
             <Activity className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{avgDiesel}%</div>
-            <p className="text-xs text-white0 mt-1">Decreased from 18% last month</p>
+            <div className="text-2xl font-bold text-on-surface">{avgDiesel}%</div>
+            <p className="text-xs text-on-surface mt-1">Decreased from 18% last month</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
+        <Card className="bg-surface border-outline-variant rounded-xl overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">Unserved Energy</CardTitle>
+            <CardTitle className="text-sm font-medium text-outline">Unserved Energy</CardTitle>
             <Zap className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">42 kWh</div>
-            <p className="text-xs text-white0 mt-1">0 critical load drops</p>
+            <div className="text-2xl font-bold text-on-surface">42 kWh</div>
+            <p className="text-xs text-on-surface mt-1">0 critical load drops</p>
           </CardContent>
         </Card>
       </div>
@@ -106,7 +113,7 @@ export default function AnalyticsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Renewable Penetration Chart */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
+        <Card className="bg-surface border-outline-variant rounded-xl overflow-hidden">
           <CardHeader>
             <CardTitle>Renewable Penetration & Diesel Trend</CardTitle>
           </CardHeader>
@@ -114,10 +121,10 @@ export default function AnalyticsPage() {
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
                   <XAxis dataKey="day" stroke="#94a3b8" tick={{fontSize: 10}} interval={4} />
                   <YAxis stroke="#94a3b8" tick={{fontSize: 12}} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} />
                   <Legend />
                   <Line type="monotone" dataKey="renewablePenetration" stroke="#10b981" strokeWidth={2} dot={false} name="Renewable %" />
                   <Line type="monotone" dataKey="dieselDependency" stroke="#f87171" strokeWidth={2} dot={false} name="Diesel %" />
@@ -128,7 +135,7 @@ export default function AnalyticsPage() {
         </Card>
 
         {/* Uptime / Outage Chart */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl overflow-hidden">
+        <Card className="bg-surface border-outline-variant rounded-xl overflow-hidden">
           <CardHeader>
             <CardTitle>System Uptime & Outage Events</CardTitle>
           </CardHeader>
@@ -136,10 +143,10 @@ export default function AnalyticsPage() {
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
                   <XAxis dataKey="day" stroke="#94a3b8" tick={{fontSize: 10}} interval={4} />
                   <YAxis stroke="#94a3b8" domain={[90, 100]} tick={{fontSize: 12}} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} />
                   <Legend />
                   <Area type="monotone" dataKey="uptime" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} name="Uptime %" />
                 </AreaChart>
@@ -152,3 +159,4 @@ export default function AnalyticsPage() {
     </div>
   );
 }
+

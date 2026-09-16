@@ -96,27 +96,27 @@ export default function ForecastPage() {
   return (
     <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 border-b border-outline-variant pb-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-2xl font-bold tracking-tight text-on-surface flex items-center gap-3">
             Weather & Renewable Generation Forecast
             <span className="text-[10px] font-bold bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 uppercase tracking-wider flex items-center gap-1">
               Open-Meteo Free API
             </span>
           </h2>
-          <p className="text-slate-400 text-sm mt-1">Physics-grounded PV irradiation models, anemometer wind curves, and 48-hour planning horizons</p>
+          <p className="text-outline text-sm mt-1">Physics-grounded PV irradiation models, anemometer wind curves, and 48-hour planning horizons</p>
         </div>
         
-        <div className="flex bg-slate-900 rounded-md border border-slate-700 p-1">
+        <div className="flex bg-surface rounded-md border border-outline p-1">
           <button 
             onClick={() => setHorizon(24)}
-            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 24 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 24 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-outline hover:text-on-surface'}`}
           >
             24h Horizon
           </button>
           <button 
             onClick={() => setHorizon(48)}
-            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 48 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'text-slate-400 hover:text-white'}`}
+            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 48 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'text-outline hover:text-on-surface'}`}
           >
             48h Horizon
           </button>
@@ -124,13 +124,13 @@ export default function ForecastPage() {
       </div>
 
       {/* Operational Timeline Panels */}
-      <Card className="bg-slate-900/50 border-slate-800">
-        <CardHeader className="pb-3 border-b border-slate-800/50 flex flex-row items-center justify-between">
-          <CardTitle className="text-sm font-bold flex items-center gap-2 text-white uppercase tracking-wider">
+      <Card className="bg-surface/50 border-outline-variant">
+        <CardHeader className="pb-3 border-b border-outline-variant flex flex-row items-center justify-between">
+          <CardTitle className="text-sm font-bold flex items-center gap-2 text-on-surface uppercase tracking-wider">
             <Calendar size={16} className="text-emerald-500" />
             48-Hour Operational Timeline & Risk Detection
           </CardTitle>
-          <div className="text-[11px] text-slate-500 font-mono">Location: Dhordo, Gujarat (23.83°N, 69.85°E)</div>
+          <div className="text-[11px] text-outline font-mono">Location: Dhordo, Gujarat (23.83°N, 69.85°E)</div>
         </CardHeader>
         <CardContent className="pt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {opBlocks.map((block, idx) => {
@@ -150,22 +150,22 @@ export default function ForecastPage() {
             }
 
             return (
-              <div key={idx} className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3 flex flex-col justify-between">
+              <div key={idx} className="bg-surface-container border border-outline/50 rounded-lg p-3 flex flex-col justify-between">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-xs font-bold text-blue-400">{block.offsetIndex === 0 ? 'NOW' : `+${block.offsetIndex}h`}</span>
                   <span className="text-xs font-mono text-orange-400">{block.time}</span>
                 </div>
                 <div className="space-y-1 text-[11px]">
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Solar:</span>
+                    <span className="text-outline">Solar:</span>
                     <span className="text-yellow-400 font-mono font-bold">{formatPower(block.solar)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Wind:</span>
+                    <span className="text-outline">Wind:</span>
                     <span className="text-blue-400 font-mono font-bold">{formatPower(block.wind)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Demand:</span>
+                    <span className="text-outline">Demand:</span>
                     <span className="text-purple-400 font-mono font-bold">{formatPower(block.demand)}</span>
                   </div>
                 </div>
@@ -181,14 +181,14 @@ export default function ForecastPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Graph 1 */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-surface border-outline-variant">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+              <CardTitle className="text-sm font-bold text-on-surface flex items-center gap-2">
                 <Sun size={16} className="text-yellow-500" />
                 Graph 1: Solar Radiation (GHI & DNI)
               </CardTitle>
-              <p className="text-[10px] text-slate-500 mt-1">Global Horizontal & Direct Normal Irradiance (W/m²)</p>
+              <p className="text-[10px] text-outline mt-1">Global Horizontal & Direct Normal Irradiance (W/m²)</p>
             </div>
             <div className="text-[10px] text-yellow-500 font-mono">Max 940 W/m²</div>
           </CardHeader>
@@ -202,10 +202,10 @@ export default function ForecastPage() {
                       <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} interval={5} />
                   <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                  <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', fontSize: '11px' }} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend iconType="plainline" wrapperStyle={{ fontSize: '11px' }} />
                   <Area type="monotone" dataKey="ghi" stroke="#f59e0b" strokeWidth={2} fillOpacity={1} fill="url(#colorGHI)" name="GHI (W/m²)" />
                   <Area type="monotone" dataKey="dni" stroke="#fbbf24" strokeWidth={1} strokeDasharray="3 3" fill="none" name="DNI (W/m²)" />
@@ -216,14 +216,14 @@ export default function ForecastPage() {
         </Card>
 
         {/* Graph 2 */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-surface border-outline-variant">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+              <CardTitle className="text-sm font-bold text-on-surface flex items-center gap-2">
                 <Sun size={16} className="text-emerald-500" />
                 Graph 2: Solar Generation Forecast ({powerScale})
               </CardTitle>
-              <p className="text-[10px] text-slate-500 mt-1">PV Array Output factoring temperature losses & soiling</p>
+              <p className="text-[10px] text-outline mt-1">PV Array Output factoring temperature losses & soiling</p>
             </div>
             <div className="text-[10px] text-emerald-500 font-mono">Cap: {formatPower(250000)}</div>
           </CardHeader>
@@ -231,10 +231,10 @@ export default function ForecastPage() {
             <div className="h-[250px] w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} interval={5} />
                   <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)}`} />
-                  <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', fontSize: '11px' }} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend iconType="plainline" wrapperStyle={{ fontSize: '11px' }} />
                   <Area type="monotone" dataKey="solar" stroke="#eab308" strokeWidth={2} fill="#eab308" fillOpacity={0.1} name="Expected Solar" />
                 </AreaChart>
@@ -244,14 +244,14 @@ export default function ForecastPage() {
         </Card>
 
         {/* Graph 3 & 4 */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-surface border-outline-variant">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+              <CardTitle className="text-sm font-bold text-on-surface flex items-center gap-2">
                 <Wind size={16} className="text-blue-500" />
                 Graph 3 & 4: Wind Speed vs Turbine Generation
               </CardTitle>
-              <p className="text-[10px] text-slate-500 mt-1">Anemometer wind speed (m/s) mapped to turbine power curve</p>
+              <p className="text-[10px] text-outline mt-1">Anemometer wind speed (m/s) mapped to turbine power curve</p>
             </div>
             <div className="text-[10px] text-blue-500 font-mono">Cap: {formatPower(100000)}</div>
           </CardHeader>
@@ -259,7 +259,7 @@ export default function ForecastPage() {
             <div className="h-[250px] w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={displayData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} interval={5} />
                   
                   {/* Left Y Axis for Generation (kW) */}
@@ -268,7 +268,7 @@ export default function ForecastPage() {
                   {/* Right Y Axis for Speed (m/s) */}
                   <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${val} m/s`} />
                   
-                  <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', fontSize: '11px' }} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend wrapperStyle={{ fontSize: '11px' }} />
                   
                   <Area yAxisId="left" type="monotone" dataKey="wind" fill="#0284c7" fillOpacity={0.2} stroke="#0ea5e9" strokeWidth={2} name={`Turbine Power`} />
@@ -280,14 +280,14 @@ export default function ForecastPage() {
         </Card>
 
         {/* Graph 7 */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-surface border-outline-variant">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <div>
-              <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+              <CardTitle className="text-sm font-bold text-on-surface flex items-center gap-2">
                 <Activity size={16} className="text-emerald-500" />
                 Graph 7: Renewable Supply vs Predicted Demand
               </CardTitle>
-              <p className="text-[10px] text-slate-500 mt-1">Expected combined output with a 12% weather uncertainty band</p>
+              <p className="text-[10px] text-outline mt-1">Expected combined output with a 12% weather uncertainty band</p>
             </div>
             <div className="text-[10px] text-emerald-500 font-mono">Reliability: 99.8%</div>
           </CardHeader>
@@ -295,10 +295,10 @@ export default function ForecastPage() {
             <div className="h-[250px] w-full mt-2">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} interval={5} />
                   <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)}`} />
-                  <RechartsTooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', fontSize: '11px' }} />
+                  <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend iconType="plainline" wrapperStyle={{ fontSize: '11px' }} />
                   
                   <Area type="monotone" dataKey="supply" fill="#10b981" fillOpacity={0.2} stroke="#10b981" strokeWidth={2} name="Renewable Supply" />
@@ -313,3 +313,4 @@ export default function ForecastPage() {
     </div>
   );
 }
+

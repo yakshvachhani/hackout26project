@@ -6,37 +6,94 @@ import { Settings2, Activity, Zap, Database, RotateCcw, CheckCircle2, Save, Refr
 import { useSettings } from '@/contexts/SettingsContext';
 
 export default function SettingsPage() {
-  const { setSettings } = useSettings();
+  const { 
+    setSettings, 
+    rates, 
+    currency: ctxCurrency, 
+    powerScale: ctxPowerScale, 
+    solarCap: ctxSolar, 
+    windCap: ctxWind, 
+    bessCap: ctxBess, 
+    dieselPrice: ctxDiesel 
+  } = useSettings();
   
   // Toggle states
-  const [currency, setCurrency] = useState('₹');
-  const [powerScale, setPowerScale] = useState('kW');
+  const [currency, setCurrency] = useState(ctxCurrency);
+  const [powerScale, setPowerScale] = useState(ctxPowerScale);
 
   // Input states
-  const [solarCap, setSolarCap] = useState(250);
-  const [windCap, setWindCap] = useState(100);
-  const [bessCap, setBessCap] = useState(500);
-  const [dieselPrice, setDieselPrice] = useState(92);
+  const [solarCap, setSolarCap] = useState(ctxSolar);
+  const [windCap, setWindCap] = useState(ctxWind);
+  const [bessCap, setBessCap] = useState(ctxBess);
+  const [dieselPrice, setDieselPrice] = useState(ctxDiesel);
 
   // Status states
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
-  // Load saved settings on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('microgrid_settings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (parsed.currency) setCurrency(parsed.currency);
-        if (parsed.powerScale) setPowerScale(parsed.powerScale);
-        if (parsed.solarCap) setSolarCap(parsed.solarCap);
-        if (parsed.windCap) setWindCap(parsed.windCap);
-        if (parsed.bessCap) setBessCap(parsed.bessCap);
-        if (parsed.dieselPrice) setDieselPrice(parsed.dieselPrice);
-      } catch (e) {}
+  const fetchLiveDieselPrice = async (targetCurrency?: string) => {
+    setIsFetchingPrice(true);
+    try {
+      const res = await fetch('https://www.fueleconomy.gov/ws/rest/fuelprices');
+      const text = await res.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(text, "text/xml");
+      const dieselNode = xmlDoc.getElementsByTagName("diesel")[0];
+      
+      if (dieselNode && dieselNode.textContent) {
+        // Price is in USD per gallon
+        const priceUSDPerGallon = parseFloat(dieselNode.textContent);
+        // Convert to USD per liter (1 Gallon = 3.78541 Liters)
+        const priceUSDPerLiter = priceUSDPerGallon / 3.78541;
+        
+        // Convert from USD to current selected currency
+        const cur = targetCurrency || currency;
+        const currentRate = rates[cur] || 1;
+        const priceInCurrentCurrency = priceUSDPerLiter * currentRate;
+        
+        setDieselPrice(Number(priceInCurrentCurrency.toFixed(2)));
+      }
+    } catch (e) {
+      console.error("Failed to fetch live diesel price:", e);
+    } finally {
+      setIsFetchingPrice(false);
     }
-  }, []);
+  };
+
+  // Sync local state with context if context updates (e.g., initial fetch completes)
+  useEffect(() => {
+    setCurrency(ctxCurrency);
+    setPowerScale(ctxPowerScale);
+    setSolarCap(ctxSolar);
+    setWindCap(ctxWind);
+    setBessCap(ctxBess);
+    setDieselPrice(ctxDiesel);
+  }, [ctxCurrency, ctxPowerScale, ctxSolar, ctxWind, ctxBess, ctxDiesel]);
+
+  const handleCurrencyChange = (newCur: string) => {
+    if (newCur === currency) return;
+    const currentRate = rates[currency] || 1;
+    const newRate = rates[newCur] || 1;
+    const priceInUSD = dieselPrice / currentRate;
+    const newPrice = priceInUSD * newRate;
+    setDieselPrice(Number(newPrice.toFixed(2)));
+    setCurrency(newCur);
+  };
+
+  const handlePowerScaleChange = (newScale: string) => {
+    if (newScale === powerScale) return;
+    if (newScale === 'MW' && powerScale === 'kW') {
+      setSolarCap(Number((solarCap / 1000).toFixed(3)));
+      setWindCap(Number((windCap / 1000).toFixed(3)));
+      setBessCap(Number((bessCap / 1000).toFixed(3)));
+    } else if (newScale === 'kW' && powerScale === 'MW') {
+      setSolarCap(solarCap * 1000);
+      setWindCap(windCap * 1000);
+      setBessCap(bessCap * 1000);
+    }
+    setPowerScale(newScale);
+  };
 
   const handleApplyChanges = () => {
     setIsSaving(true);
@@ -68,21 +125,21 @@ export default function SettingsPage() {
       
       {/* Top Title */}
       <div className="flex items-center gap-3">
-        <div className="p-2 bg-slate-800 rounded-lg">
-          <Settings2 size={24} className="text-slate-300" />
+        <div className="p-2 bg-surface-container rounded-lg">
+          <Settings2 size={24} className="text-on-surface-variant" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">System Configuration</h1>
-          <p className="text-sm text-slate-400 mt-1">Manage global display formats and baseline asset sizing</p>
+          <h1 className="text-2xl font-bold text-on-surface tracking-tight">System Configuration</h1>
+          <p className="text-sm text-outline mt-1">Manage global display formats and baseline asset sizing</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Panel: Preferences */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl h-full">
-          <CardHeader className="pb-4 border-b border-slate-800/50">
-            <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
+        <Card className="bg-surface border-outline-variant rounded-xl h-full">
+          <CardHeader className="pb-4 border-b border-outline-variant">
+            <CardTitle className="text-sm font-bold flex items-center gap-2 text-on-surface">
               <Database size={16} className="text-indigo-500" /> Global Formatting
             </CardTitle>
           </CardHeader>
@@ -90,15 +147,15 @@ export default function SettingsPage() {
             
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-sm font-bold text-slate-200">Currency Display</h4>
-                <p className="text-xs text-slate-400 mt-1">Preferred fiat conversion for all costs</p>
+                <h4 className="text-sm font-bold text-on-surface">Currency Display</h4>
+                <p className="text-xs text-outline mt-1">Preferred fiat conversion for all costs</p>
               </div>
-              <div className="flex bg-[#1e293b] rounded-lg p-1 border border-slate-700/50">
+              <div className="flex bg-surface-container rounded-lg p-1 border border-outline/50">
                 {['₹', '$', '€'].map(cur => (
                   <button 
                     key={cur}
-                    onClick={() => setCurrency(cur)}
-                    className={`w-10 py-1.5 text-sm font-bold rounded-md transition-colors ${currency === cur ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                    onClick={() => handleCurrencyChange(cur)}
+                    className={`w-10 py-1.5 text-sm font-bold rounded-md transition-colors ${currency === cur ? 'bg-emerald-600 text-on-surface shadow-md' : 'text-outline hover:text-on-surface'}`}
                   >
                     {cur}
                   </button>
@@ -108,15 +165,15 @@ export default function SettingsPage() {
 
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-sm font-bold text-slate-200">Power Rating Scale</h4>
-                <p className="text-xs text-slate-400 mt-1">Default metric representation for capacity</p>
+                <h4 className="text-sm font-bold text-on-surface">Power Rating Scale</h4>
+                <p className="text-xs text-outline mt-1">Default metric representation for capacity</p>
               </div>
-              <div className="flex bg-[#1e293b] rounded-lg p-1 border border-slate-700/50">
+              <div className="flex bg-surface-container rounded-lg p-1 border border-outline/50">
                 {['kW', 'MW'].map(unit => (
                   <button 
                     key={unit}
-                    onClick={() => setPowerScale(unit)}
-                    className={`w-12 py-1.5 text-xs font-bold rounded-md transition-colors ${currency === unit ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'}`}
+                    onClick={() => handlePowerScaleChange(unit)}
+                    className={`w-12 py-1.5 text-xs font-bold rounded-md transition-colors ${powerScale === unit ? 'bg-emerald-600 text-on-surface shadow-md' : 'text-outline hover:text-on-surface'}`}
                   >
                     {unit}
                   </button>
@@ -128,9 +185,9 @@ export default function SettingsPage() {
         </Card>
 
         {/* Right Panel: Asset Sizing */}
-        <Card className="lg:col-span-2 bg-[#0f172a] border-slate-800/50 rounded-xl h-full flex flex-col">
-          <CardHeader className="pb-4 border-b border-slate-800/50">
-            <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
+        <Card className="lg:col-span-2 bg-surface border-outline-variant rounded-xl h-full flex flex-col">
+          <CardHeader className="pb-4 border-b border-outline-variant">
+            <CardTitle className="text-sm font-bold flex items-center gap-2 text-on-surface">
               <Zap size={16} className="text-amber-500" /> Asset Sizing & Fuel Pricing
             </CardTitle>
           </CardHeader>
@@ -138,42 +195,52 @@ export default function SettingsPage() {
             
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 block">Solar PV Capacity ({powerScale})</label>
+                <label className="text-xs font-bold text-outline block">Solar PV Capacity ({powerScale})</label>
                 <input 
                   type="number" 
                   value={solarCap} 
                   onChange={(e) => setSolarCap(Number(e.target.value))}
-                  className="w-full bg-[#1e293b] border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-amber-500 transition-colors font-mono"
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-amber-500 transition-colors font-mono"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 block">Wind Capacity ({powerScale})</label>
+                <label className="text-xs font-bold text-outline block">Wind Capacity ({powerScale})</label>
                 <input 
                   type="number" 
                   value={windCap} 
                   onChange={(e) => setWindCap(Number(e.target.value))}
-                  className="w-full bg-[#1e293b] border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-blue-500 transition-colors font-mono"
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-blue-500 transition-colors font-mono"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 block">BESS Storage ({powerScale}h)</label>
+                <label className="text-xs font-bold text-outline block">BESS Storage ({powerScale}h)</label>
                 <input 
                   type="number" 
                   value={bessCap} 
                   onChange={(e) => setBessCap(Number(e.target.value))}
-                  className="w-full bg-[#1e293b] border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors font-mono"
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors font-mono"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 block">Diesel Fuel Price ({currency}/L)</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-outline block">Diesel Fuel Price ({currency}/L)</label>
+                  <button 
+                    onClick={() => fetchLiveDieselPrice()}
+                    disabled={isFetchingPrice}
+                    className="text-[10px] font-bold text-blue-500 hover:text-blue-400 flex items-center gap-1 disabled:opacity-50"
+                  >
+                    <RefreshCw size={10} className={isFetchingPrice ? "animate-spin" : ""} />
+                    Live Price
+                  </button>
+                </div>
                 <input 
                   type="number" 
                   value={dieselPrice} 
                   onChange={(e) => setDieselPrice(Number(e.target.value))}
-                  className="w-full bg-[#1e293b] border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-red-500 transition-colors font-mono"
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-red-500 transition-colors font-mono"
                 />
               </div>
             </div>
@@ -181,7 +248,7 @@ export default function SettingsPage() {
             <div className="flex justify-between items-end mt-8">
               <button 
                 onClick={handleReset}
-                className="text-xs text-slate-400 hover:text-slate-200 underline decoration-slate-700 underline-offset-4 transition-colors"
+                className="text-xs text-outline hover:text-on-surface underline decoration-slate-700 underline-offset-4 transition-colors"
               >
                 Reset to Site Defaults
               </button>
@@ -212,23 +279,23 @@ export default function SettingsPage() {
       </div>
 
       {/* Bottom Full-Width Panel: Diagnostics */}
-      <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl">
-        <CardHeader className="pb-4 border-b border-slate-800/50">
+      <Card className="bg-surface border-outline-variant rounded-xl">
+        <CardHeader className="pb-4 border-b border-outline-variant">
           <div className="flex justify-between items-center">
-            <CardTitle className="text-sm font-bold flex items-center gap-2 text-white">
+            <CardTitle className="text-sm font-bold flex items-center gap-2 text-on-surface">
               <Activity size={16} className="text-blue-500" /> Diagnostic Service Status & Integration Health
             </CardTitle>
             <span className="text-xs font-bold text-emerald-500 tracking-wide">All Systems Nominal</span>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Open-Meteo */}
-            <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
+            <div className="flex justify-between items-center bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div>
-                <h4 className="text-sm font-bold text-slate-200">Open-Meteo REST API</h4>
-                <p className="text-[11px] text-slate-400 mt-0.5">Free, No-Key Weather Telemetry</p>
+                <h4 className="text-sm font-bold text-on-surface">Open-Meteo REST API</h4>
+                <p className="text-[11px] text-outline mt-0.5">Free, No-Key Weather Telemetry</p>
               </div>
               <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -236,23 +303,11 @@ export default function SettingsPage() {
               </span>
             </div>
 
-            {/* Gemini */}
-            <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
-              <div>
-                <h4 className="text-sm font-bold text-slate-200">Gemini AI Assistant</h4>
-                <p className="text-[11px] text-slate-400 mt-0.5">Energy Intelligence Engine</p>
-              </div>
-              <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20 flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                ACTIVE
-              </span>
-            </div>
-
             {/* LP Solver */}
-            <div className="flex justify-between items-center bg-[#1e293b]/50 p-4 rounded-xl border border-slate-800/50">
+            <div className="flex justify-between items-center bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div>
-                <h4 className="text-sm font-bold text-slate-200">LP Dispatch Solver</h4>
-                <p className="text-[11px] text-slate-400 mt-0.5">Multi-interval Optimization</p>
+                <h4 className="text-sm font-bold text-on-surface">LP Dispatch Solver</h4>
+                <p className="text-[11px] text-outline mt-0.5">Multi-interval Optimization</p>
               </div>
               <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20 flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -267,3 +322,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

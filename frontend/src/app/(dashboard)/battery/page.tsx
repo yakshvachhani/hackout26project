@@ -94,8 +94,8 @@ export default function BatteryIntelligencePage() {
   const SocTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#0f172a] border border-slate-700 p-2 rounded shadow-xl text-xs">
-          <span className="text-slate-400">{label}</span><br />
+        <div className="bg-surface border border-outline p-2 rounded shadow-xl text-xs">
+          <span className="text-outline">{label}</span><br />
           <span className="text-emerald-500 font-bold">SOC: {payload[0].value}%</span>
         </div>
       );
@@ -107,8 +107,8 @@ export default function BatteryIntelligencePage() {
     if (active && payload && payload.length) {
       const val = payload[0].value;
       return (
-        <div className="bg-[#0f172a] border border-slate-700 p-2 rounded shadow-xl text-xs">
-          <span className="text-slate-400">{label}</span><br />
+        <div className="bg-surface border border-outline p-2 rounded shadow-xl text-xs">
+          <span className="text-outline">{label}</span><br />
           <span className={val >= 0 ? "text-emerald-500 font-bold" : "text-amber-400 font-bold"}>
             {val >= 0 ? `Discharging: ${val} kW` : `Charging: ${Math.abs(val)} kW`}
           </span>
@@ -125,17 +125,17 @@ export default function BatteryIntelligencePage() {
       <div className="flex justify-between items-start">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-2xl font-bold tracking-tight text-white">Battery Energy Storage (BESS) Intelligence</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-on-surface">Battery Energy Storage (BESS) Intelligence</h2>
             <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-500/20">
               LiFePO4 500 kWh
             </span>
           </div>
-          <p className="text-slate-400 text-sm">Lithium Iron Phosphate storage cycling, degradation modeling, C-rate limits, and optimal absorption windows</p>
+          <p className="text-outline text-sm">Lithium Iron Phosphate storage cycling, degradation modeling, C-rate limits, and optimal absorption windows</p>
         </div>
         
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0f172a] border border-slate-800/50 rounded-full">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-surface border border-outline-variant rounded-full">
           <Thermometer size={14} className="text-emerald-500" />
-          <span className="text-xs text-slate-300 font-medium">Pack Temp: <span className="text-white font-bold">{temp.toFixed(1)}°C</span> (Nominal)</span>
+          <span className="text-xs text-on-surface-variant font-medium">Pack Temp: <span className="text-on-surface font-bold">{temp.toFixed(1)}°C</span> (Nominal)</span>
         </div>
       </div>
 
@@ -143,31 +143,31 @@ export default function BatteryIntelligencePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* SOC */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl relative overflow-hidden">
+        <Card className="bg-surface border-outline-variant rounded-xl relative overflow-hidden">
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-2">
-              <span className="text-xs font-bold text-slate-400">State of Charge (SOC)</span>
+              <span className="text-xs font-bold text-outline">State of Charge (SOC)</span>
               <Battery size={16} className="text-emerald-500" />
             </div>
             <div className="text-3xl font-bold text-emerald-500 mb-3">{soc.toFixed(1)}%</div>
             
             {/* Progress Bar */}
-            <div className="w-full h-1.5 bg-slate-800 rounded-full mb-2 overflow-hidden">
+            <div className="w-full h-1.5 bg-surface-container rounded-full mb-2 overflow-hidden">
               <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${soc}%` }}></div>
             </div>
-            <p className="text-[10px] text-white0">{(soc * 5).toFixed(1)} kWh available</p>
+            <p className="text-[10px] text-on-surface">{(soc * 5).toFixed(1)} kWh available</p>
           </CardContent>
         </Card>
 
         {/* Instantaneous Flow */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl">
+        <Card className="bg-surface border-outline-variant rounded-xl">
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-2">
-              <span className="text-xs font-bold text-slate-400">Instantaneous Flow</span>
+              <span className="text-xs font-bold text-outline">Instantaneous Flow</span>
               <Zap size={16} className="text-emerald-500" />
             </div>
-            <div className="text-3xl font-bold text-white mb-2 flex items-baseline gap-1">
-              {flow > 0 ? '+' : ''}{flow.toFixed(1)} <span className="text-sm font-normal text-white0">kW</span>
+            <div className="text-3xl font-bold text-on-surface mb-2 flex items-baseline gap-1">
+              {flow > 0 ? '+' : ''}{flow.toFixed(1)} <span className="text-sm font-normal text-on-surface">kW</span>
             </div>
             <div className="flex items-center gap-1.5 mt-4">
               <div className={`w-1.5 h-1.5 rounded-full ${flow > 0 ? 'bg-emerald-500' : 'bg-amber-500'} animate-pulse`}></div>
@@ -179,26 +179,26 @@ export default function BatteryIntelligencePage() {
         </Card>
 
         {/* SOH */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl">
+        <Card className="bg-surface border-outline-variant rounded-xl">
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-2">
-              <span className="text-xs font-bold text-slate-400">State of Health (SOH)</span>
+              <span className="text-xs font-bold text-outline">State of Health (SOH)</span>
               <ShieldCheck size={16} className="text-emerald-500" />
             </div>
             <div className="text-3xl font-bold text-emerald-500 mb-4">97.4%</div>
-            <p className="text-[10px] text-white0">842 Equivalent Full Cycles</p>
+            <p className="text-[10px] text-on-surface">842 Equivalent Full Cycles</p>
           </CardContent>
         </Card>
 
         {/* Efficiency */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl">
+        <Card className="bg-surface border-outline-variant rounded-xl">
           <CardContent className="p-5">
             <div className="flex justify-between items-start mb-2">
-              <span className="text-xs font-bold text-slate-400">Roundtrip Efficiency</span>
+              <span className="text-xs font-bold text-outline">Roundtrip Efficiency</span>
               <RefreshCw size={16} className="text-blue-500" />
             </div>
             <div className="text-3xl font-bold text-blue-400 mb-4">91.8%</div>
-            <p className="text-[10px] text-white0">Degradation cost: ₹1.40 / kWh</p>
+            <p className="text-[10px] text-on-surface">Degradation cost: ₹1.40 / kWh</p>
           </CardContent>
         </Card>
 
@@ -208,12 +208,12 @@ export default function BatteryIntelligencePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* SOC Profile Chart */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl flex flex-col">
+        <Card className="bg-surface border-outline-variant rounded-xl flex flex-col">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-sm font-bold text-white">Graph 1: Battery SOC Profile over 24h</CardTitle>
-                <p className="text-xs text-slate-400 mt-1">Predicted state of charge respecting 20% reserve floor</p>
+                <CardTitle className="text-sm font-bold text-on-surface">Graph 1: Battery SOC Profile over 24h</CardTitle>
+                <p className="text-xs text-outline mt-1">Predicted state of charge respecting 20% reserve floor</p>
               </div>
               <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Safe: 20%-95%</span>
             </div>
@@ -221,10 +221,10 @@ export default function BatteryIntelligencePage() {
           <CardContent className="flex-1 min-h-[250px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={socData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={10} minTickGap={20} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} domain={[0, 100]} tickFormatter={v => `${v}%`} />
-                <Tooltip content={<SocTooltip />} cursor={{ stroke: '#334155', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <Tooltip content={<SocTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 
                 <ReferenceLine y={20} stroke="#ef4444" strokeDasharray="3 3" label={{ position: 'insideBottomRight', value: 'Reserve Floor (20%)', fill: '#ef4444', fontSize: 10 }} />
                 
@@ -242,23 +242,23 @@ export default function BatteryIntelligencePage() {
         </Card>
 
         {/* Inverter Power Chart */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl flex flex-col">
+        <Card className="bg-surface border-outline-variant rounded-xl flex flex-col">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-sm font-bold text-white">Graph 2: Charge / Discharge Inverter Power</CardTitle>
-                <p className="text-xs text-slate-400 mt-1">Positive = discharging to load. Negative = charging from solar</p>
+                <CardTitle className="text-sm font-bold text-on-surface">Graph 2: Charge / Discharge Inverter Power</CardTitle>
+                <p className="text-xs text-outline mt-1">Positive = discharging to load. Negative = charging from solar</p>
               </div>
-              <span className="text-[10px] font-bold text-white uppercase tracking-wider">Max: 120 kW</span>
+              <span className="text-[10px] font-bold text-on-surface uppercase tracking-wider">Max: 120 kW</span>
             </div>
           </CardHeader>
           <CardContent className="flex-1 min-h-[250px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={inverterData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={10} minTickGap={20} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} domain={[-60, 100]} tickFormatter={v => `${v} kW`} />
-                <Tooltip content={<InverterTooltip />} cursor={{ stroke: '#334155', strokeWidth: 1, strokeDasharray: '4 4' }} />
+                <Tooltip content={<InverterTooltip />} cursor={{ stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 
                 <ReferenceLine y={0} stroke="#475569" strokeOpacity={0.5} />
                 
@@ -282,12 +282,12 @@ export default function BatteryIntelligencePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Degradation Chart */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl flex flex-col">
+        <Card className="bg-surface border-outline-variant rounded-xl flex flex-col">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-sm font-bold text-white">Graph 3: Projected Battery Degradation Curve</CardTitle>
-                <p className="text-xs text-slate-400 mt-1">Capacity retention vs full equivalent cycles (LiFePO4 cell aging)</p>
+                <CardTitle className="text-sm font-bold text-on-surface">Graph 3: Projected Battery Degradation Curve</CardTitle>
+                <p className="text-xs text-outline mt-1">Capacity retention vs full equivalent cycles (LiFePO4 cell aging)</p>
               </div>
               <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">6,000 Cycle Life</span>
             </div>
@@ -295,11 +295,11 @@ export default function BatteryIntelligencePage() {
           <CardContent className="flex-1 min-h-[250px] pt-4">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={degradationData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="cycle" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} domain={[70, 100]} tickFormatter={v => `${v}%`} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px' }}
                   itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
                 />
                 
@@ -312,31 +312,31 @@ export default function BatteryIntelligencePage() {
         </Card>
 
         {/* Text Panel */}
-        <Card className="bg-[#0f172a] border-slate-800/50 rounded-xl">
+        <Card className="bg-surface border-outline-variant rounded-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+            <CardTitle className="text-sm font-bold text-on-surface flex items-center gap-2">
               <Zap size={16} className="text-emerald-500" /> Recommended Storage Strategy
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             
-            <div className="p-4 bg-emerald-950/30 border border-emerald-900/50 rounded-xl">
-              <h4 className="text-emerald-500 font-bold text-xs mb-1">Optimal Charging Window: 10:30 – 14:30</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+            <div className="p-4 bg-primary-container/60 border border-primary/20 rounded-xl">
+              <h4 className="text-on-primary-container font-bold text-sm mb-1">Optimal Charging Window: 10:30 – 14:30</h4>
+              <p className="text-xs text-on-surface-variant leading-relaxed font-medium">
                 Schedule full charging rate during peak irradiance to prevent curtailment and absorb 180 kWh of surplus PV power before 15:00.
               </p>
             </div>
 
-            <div className="p-4 bg-emerald-950/30 border border-emerald-900/50 rounded-xl">
-              <h4 className="text-emerald-500 font-bold text-xs mb-1">Peak Discharge Window: 18:30 – 21:30</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+            <div className="p-4 bg-primary-container/60 border border-primary/20 rounded-xl">
+              <h4 className="text-on-primary-container font-bold text-sm mb-1">Peak Discharge Window: 18:30 – 21:30</h4>
+              <p className="text-xs text-on-surface-variant leading-relaxed font-medium">
                 Discharge at up to 85 kW to bridge community lighting load without starting the diesel generator.
               </p>
             </div>
 
-            <div className="p-4 bg-[#1e293b]/50 border border-slate-800/50 rounded-xl">
-              <h4 className="text-slate-300 font-bold text-xs mb-1">Critical Emergency Reserve Floor: 20% (100 kWh)</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+            <div className="p-4 bg-error-container/60 border border-error/20 rounded-xl">
+              <h4 className="text-on-error-container font-bold text-sm mb-1">Critical Emergency Reserve Floor: 20% (100 kWh)</h4>
+              <p className="text-xs text-on-surface-variant leading-relaxed font-medium">
                 Preserve 100 kWh exclusively for primary healthcare clinic refrigerators and rural emergency communications.
               </p>
             </div>
@@ -349,3 +349,4 @@ export default function BatteryIntelligencePage() {
     </div>
   );
 }
+

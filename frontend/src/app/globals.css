@@ -1,26 +1,55 @@
 @import "tailwindcss";
 
+@theme {
+  --color-background: #f8fafc;
+  --color-on-background: #0f172a;
+
+  --color-surface: #ffffff;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #e2e8f0;
+  
+  --color-on-surface: #0f172a;
+  --color-on-surface-variant: #64748b;
+  
+  --color-outline: #94a3b8;
+  --color-outline-variant: #cbd5e1;
+
+  --color-primary: #059669;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #ecfdf5;
+  --color-on-primary-container: #065f46;
+
+  --color-secondary: #0284c7;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #f0f9ff;
+  --color-on-secondary-container: #0369a1;
+
+  --color-tertiary: #7c3aed;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #f3e8ff;
+  --color-on-tertiary-container: #581c87;
+
+  --color-error: #dc2626;
+  --color-on-error: #ffffff;
+  --color-error-container: #fef2f2;
+  --color-on-error-container: #991b1b;
+  
+  --color-warning: #d97706;
+  --color-warning-container: #fffbeb;
+  --color-on-warning-container: #92400e;
+
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-telemetry-display: "JetBrains Mono", monospace;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #f8fafc;
+  --foreground: #0f172a;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
 }

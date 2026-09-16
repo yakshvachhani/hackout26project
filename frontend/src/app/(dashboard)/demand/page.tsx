@@ -102,17 +102,17 @@ export default function DemandPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-bold tracking-tight text-white">Community Electricity Demand & Profiler</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-on-surface">Community Electricity Demand & Profiler</h2>
             <span className="px-2 py-1 bg-indigo-500/20 text-indigo-400 text-[10px] font-bold rounded uppercase tracking-wider border border-indigo-500/30">
               Bottom-Up Consumption Model
             </span>
           </div>
-          <p className="text-slate-400 mt-1 text-sm">Configurable community circuits, critical healthcare load isolation, and demand surge stress testing</p>
+          <p className="text-outline mt-1 text-sm">Configurable community circuits, critical healthcare load isolation, and demand surge stress testing</p>
         </div>
         <button 
           onClick={triggerSpike}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-sm
-            ${spikeActive ? 'bg-red-500 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'}`}
+            ${spikeActive ? 'bg-red-500 text-on-surface' : 'bg-surface-container text-on-surface-variant hover:bg-slate-700 border border-outline'}`}
         >
           <AlertTriangle size={16} />
           Simulate 18:00 Demand Spike
@@ -120,15 +120,15 @@ export default function DemandPage() {
       </div>
 
       {/* Configuration Panel */}
-      <Card className="bg-slate-900 border-slate-800">
-        <CardHeader className="pb-2 border-b border-slate-800">
+      <Card className="bg-surface border-outline-variant">
+        <CardHeader className="pb-2 border-b border-outline-variant">
           <div className="flex justify-between items-center">
-            <CardTitle className="flex items-center gap-2 text-base text-slate-200">
+            <CardTitle className="flex items-center gap-2 text-base text-on-surface">
               <SlidersHorizontal size={16} className="text-purple-400"/> Community Circuit Configuration
             </CardTitle>
             <div className="text-sm">
-              <span className="text-slate-400">Total Peak Load: </span>
-              <span className="font-bold text-white text-lg">{totalPeakLoad} kW</span>
+              <span className="text-outline">Total Peak Load: </span>
+              <span className="font-bold text-on-surface text-lg">{totalPeakLoad} kW</span>
             </div>
           </div>
         </CardHeader>
@@ -136,25 +136,25 @@ export default function DemandPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             
             {/* Homes */}
-            <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+            <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-purple-400 text-sm font-medium">
                   <Home size={14}/> Homes
                 </div>
-                <span className="font-bold text-white text-sm">{counts.homes}</span>
+                <span className="font-bold text-on-surface text-sm">{counts.homes}</span>
               </div>
               <input type="range" min="0" max="300" value={counts.homes} onChange={(e) => handleSlider('homes', e.target.value)} 
                 className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#a855f7' }}/>
-              <div className="mt-3 text-[11px] text-slate-500">{peaks.homes} kW peak</div>
+              <div className="mt-3 text-[11px] text-outline">{peaks.homes} kW peak</div>
             </div>
 
             {/* Clinic */}
-            <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+            <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-red-400 text-sm font-medium">
                   <HeartPulse size={14}/> Clinic
                 </div>
-                <span className="font-bold text-white text-sm">{counts.clinic}</span>
+                <span className="font-bold text-on-surface text-sm">{counts.clinic}</span>
               </div>
               <input type="range" min="0" max="5" value={counts.clinic} onChange={(e) => handleSlider('clinic', e.target.value)} 
                 className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#ef4444' }}/>
@@ -162,12 +162,12 @@ export default function DemandPage() {
             </div>
 
             {/* Pumps */}
-            <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+            <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-blue-400 text-sm font-medium">
                   <Droplet size={14}/> Pumps
                 </div>
-                <span className="font-bold text-white text-sm">{counts.pumps}</span>
+                <span className="font-bold text-on-surface text-sm">{counts.pumps}</span>
               </div>
               <input type="range" min="0" max="20" value={counts.pumps} onChange={(e) => handleSlider('pumps', e.target.value)} 
                 className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#3b82f6' }}/>
@@ -175,42 +175,42 @@ export default function DemandPage() {
             </div>
 
             {/* Shops */}
-            <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+            <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-yellow-400 text-sm font-medium">
                   <Store size={14}/> Shops
                 </div>
-                <span className="font-bold text-white text-sm">{counts.shops}</span>
+                <span className="font-bold text-on-surface text-sm">{counts.shops}</span>
               </div>
               <input type="range" min="0" max="50" value={counts.shops} onChange={(e) => handleSlider('shops', e.target.value)} 
                 className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#eab308' }}/>
-              <div className="mt-3 text-[11px] text-slate-500">{peaks.shops} kW</div>
+              <div className="mt-3 text-[11px] text-outline">{peaks.shops} kW</div>
             </div>
 
             {/* Schools */}
-            <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+            <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
                   <GraduationCap size={14}/> Schools
                 </div>
-                <span className="font-bold text-white text-sm">{counts.schools}</span>
+                <span className="font-bold text-on-surface text-sm">{counts.schools}</span>
               </div>
               <input type="range" min="0" max="10" value={counts.schools} onChange={(e) => handleSlider('schools', e.target.value)} 
                 className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#10b981' }}/>
-              <div className="mt-3 text-[11px] text-slate-500">{peaks.schools} kW</div>
+              <div className="mt-3 text-[11px] text-outline">{peaks.schools} kW</div>
             </div>
 
             {/* Lighting */}
-            <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+            <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center gap-2 text-slate-300 text-sm font-medium">
+                <div className="flex items-center gap-2 text-on-surface-variant text-sm font-medium">
                   <Lightbulb size={14}/> Lighting
                 </div>
-                <span className="font-bold text-white text-sm">{counts.lighting}</span>
+                <span className="font-bold text-on-surface text-sm">{counts.lighting}</span>
               </div>
               <input type="range" min="0" max="200" value={counts.lighting} onChange={(e) => handleSlider('lighting', e.target.value)} 
                 className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#94a3b8' }}/>
-              <div className="mt-3 text-[11px] text-slate-500">{peaks.lighting} kW</div>
+              <div className="mt-3 text-[11px] text-outline">{peaks.lighting} kW</div>
             </div>
 
           </div>
@@ -221,10 +221,10 @@ export default function DemandPage() {
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         
         {/* Area Chart */}
-        <Card className="bg-slate-900 border-slate-800 xl:col-span-2">
+        <Card className="bg-surface border-outline-variant xl:col-span-2">
           <CardHeader>
-            <CardTitle className="text-base text-slate-200">24-Hour Diurnal Demand Curve & Critical Base</CardTitle>
-            <p className="text-xs text-slate-500 font-normal">Total community consumption vs protected critical circuits</p>
+            <CardTitle className="text-base text-on-surface">24-Hour Diurnal Demand Curve & Critical Base</CardTitle>
+            <p className="text-xs text-outline font-normal">Total community consumption vs protected critical circuits</p>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full mt-4">
@@ -240,12 +240,12 @@ export default function DemandPage() {
                       <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} opacity={0.5} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} opacity={0.5} />
                   <XAxis dataKey="time" stroke="#64748b" tick={{fontSize: 12}} tickMargin={10} />
                   <YAxis stroke="#64748b" tick={{fontSize: 12}} tickFormatter={(val) => `${val} kW`} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc' }}
-                    itemStyle={{ color: '#f8fafc' }}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }}
+                    itemStyle={{ color: '#0f172a' }}
                   />
                   <Area type="monotone" dataKey="total" stroke="#8b5cf6" strokeWidth={3} fill="url(#colorTotal)" name="Total Community Load (kW)" />
                   <Area type="monotone" dataKey="critical" stroke="#ef4444" strokeWidth={2} fill="url(#colorCritical)" name="Critical Protected Load (kW)" />
@@ -253,10 +253,10 @@ export default function DemandPage() {
               </ResponsiveContainer>
             </div>
             <div className="flex justify-center items-center gap-6 mt-4 text-xs">
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-outline">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div> Critical Protected Load (kW)
               </div>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-outline">
                 <div className="w-3 h-3 rounded-full bg-purple-500"></div> Total Community Load (kW)
               </div>
             </div>
@@ -264,10 +264,10 @@ export default function DemandPage() {
         </Card>
 
         {/* Pie Chart */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card className="bg-surface border-outline-variant">
           <CardHeader>
-            <CardTitle className="text-base text-slate-200">Consumption by Sector</CardTitle>
-            <p className="text-xs text-slate-500 font-normal">Proportionate power draw during peak hours</p>
+            <CardTitle className="text-base text-on-surface">Consumption by Sector</CardTitle>
+            <p className="text-xs text-outline font-normal">Proportionate power draw during peak hours</p>
           </CardHeader>
           <CardContent className="flex flex-col h-full">
             <div className="h-[200px] w-full">
@@ -287,7 +287,7 @@ export default function DemandPage() {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', color: '#f8fafc', borderRadius: '8px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a', borderRadius: '8px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -297,9 +297,9 @@ export default function DemandPage() {
                   <div key={i} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
-                      <span className="text-slate-300">{item.name} <span className="text-slate-500">({item.count})</span></span>
+                      <span className="text-on-surface-variant">{item.name} <span className="text-outline">({item.count})</span></span>
                     </div>
-                    <span className="font-bold text-white">{item.value} kW</span>
+                    <span className="font-bold text-on-surface">{item.value} kW</span>
                   </div>
                 ))}
               </div>
@@ -311,3 +311,4 @@ export default function DemandPage() {
     </div>
   );
 }
+

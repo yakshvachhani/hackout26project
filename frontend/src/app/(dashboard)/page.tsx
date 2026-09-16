@@ -4,14 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Leaf, Droplet, Zap, Battery, CircleDollarSign, Wind, Sun, CloudRain, ArrowRight, Activity, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSettings } from '@/contexts/SettingsContext';
+import { useSettings, LOCATIONS } from '@/contexts/SettingsContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 // Flow Diagram Component with SVG lines
 function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any }) {
-  if (!data) return <div className="h-64 flex items-center justify-center text-slate-500">Loading flow...</div>;
+  if (!data) return <div className="h-64 flex items-center justify-center text-outline">Loading flow...</div>;
 
   const solar = data.solar || 0;
   const wind = data.wind || 0;
@@ -20,7 +20,7 @@ function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any 
   const load = data.load || 0;
   
   return (
-    <div className="relative h-[500px] w-full rounded-xl bg-slate-900 border border-slate-800 overflow-hidden flex flex-col items-center justify-center p-8">
+    <div className="relative h-[500px] w-full rounded-xl bg-surface border border-outline-variant overflow-hidden flex flex-col items-center justify-center p-8">
       {/* SVG Connecting Lines */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
         {/* Solar to Bus */}
@@ -36,21 +36,21 @@ function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any 
       </svg>
 
       {/* Central Bus */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800 px-6 py-4 rounded-xl border-2 border-emerald-500 z-10 font-bold text-emerald-400 text-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-        <div className="text-[10px] tracking-widest text-slate-400 uppercase mb-1">Microgrid Bus</div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-container px-6 py-4 rounded-xl border-2 border-emerald-500 z-10 font-bold text-emerald-400 text-center shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+        <div className="text-[10px] tracking-widest text-outline uppercase mb-1">Microgrid Bus</div>
         <div className="text-sm">3-Phase 415V</div>
-        <div className="mt-2 bg-emerald-900/50 px-2 py-1 rounded border border-emerald-500/30 text-white">
+        <div className="mt-2 bg-emerald-900/50 px-2 py-1 rounded border border-emerald-500/30 text-on-surface">
           Net: {formatPower(load)}
         </div>
       </div>
 
       {/* Solar */}
       <div className="absolute top-8 left-1/2 -translate-x-1/2 flex flex-col items-center z-10 w-40">
-        <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700 w-full text-center shadow-lg">
+        <div className="bg-surface p-3 rounded-lg border border-outline w-full text-center shadow-lg">
           <div className="flex items-center justify-center gap-2 text-yellow-400 font-bold text-xs tracking-wider mb-2">
             <Sun size={14} /> SOLAR ARRAY
           </div>
-          <div className="text-lg font-mono font-bold text-white">{formatPower(solar)}</div>
+          <div className="text-lg font-mono font-bold text-on-surface">{formatPower(solar)}</div>
           <div className="text-[10px] text-emerald-400 mt-1 flex items-center justify-center gap-1">
             <div className={`w-1.5 h-1.5 rounded-full ${solar > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600'}`}></div>
             {solar > 0 ? 'Producing' : 'Standby'}
@@ -59,12 +59,12 @@ function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any 
       </div>
       
       {/* Wind */}
-      <div className="absolute top-1/2 left-[15%] -translate-y-1/2 flex flex-col items-center z-10 w-40">
-        <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700 w-full text-center shadow-lg">
+      <div className="absolute top-1/2 left-[30%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 w-40">
+        <div className="bg-surface p-3 rounded-lg border border-outline w-full text-center shadow-lg">
           <div className="flex items-center justify-center gap-2 text-blue-400 font-bold text-xs tracking-wider mb-2">
             <Wind size={14} /> WIND MAST
           </div>
-          <div className="text-lg font-mono font-bold text-white">{formatPower(wind)}</div>
+          <div className="text-lg font-mono font-bold text-on-surface">{formatPower(wind)}</div>
           <div className="text-[10px] text-emerald-400 mt-1 flex items-center justify-center gap-1">
             <div className={`w-1.5 h-1.5 rounded-full ${wind > 0 ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600'}`}></div>
             {wind > 0 ? 'Generating' : 'Calm'}
@@ -73,15 +73,15 @@ function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any 
       </div>
 
       {/* Battery */}
-      <div className="absolute top-1/2 right-[15%] -translate-y-1/2 flex flex-col items-center z-10 w-40">
-        <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700 w-full text-center shadow-lg">
+      <div className="absolute top-1/2 left-[70%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 w-40">
+        <div className="bg-surface p-3 rounded-lg border border-outline w-full text-center shadow-lg">
           <div className="flex items-center justify-center gap-2 text-indigo-400 font-bold text-xs tracking-wider mb-2">
             <Battery size={14} /> BATTERY BESS
           </div>
-          <div className="text-lg font-mono font-bold text-white">
+          <div className="text-lg font-mono font-bold text-on-surface">
             {battery > 0 ? '+' : ''}{formatPower(battery)}
           </div>
-          <div className="text-[10px] text-slate-300 mt-1">
+          <div className="text-[10px] text-on-surface-variant mt-1">
             SOC: 66.2% <span className={battery > 0 ? "text-emerald-400" : (battery < 0 ? "text-indigo-400" : "")}>
               ({battery > 0 ? 'Discharging' : (battery < 0 ? 'Charging' : 'Idle')})
             </span>
@@ -90,13 +90,13 @@ function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any 
       </div>
 
       {/* Diesel */}
-      <div className="absolute bottom-8 left-[30%] -translate-x-1/2 flex flex-col items-center z-10 w-40">
-        <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700 w-full text-center shadow-lg">
+      <div className="absolute top-[80%] left-[40%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 w-40">
+        <div className="bg-surface p-3 rounded-lg border border-outline w-full text-center shadow-lg">
           <div className="flex items-center justify-center gap-2 text-red-400 font-bold text-xs tracking-wider mb-2">
             <Droplet size={14} /> DIESEL GENSET
           </div>
-          <div className="text-lg font-mono font-bold text-white">{formatPower(diesel)}</div>
-          <div className="text-[10px] text-slate-400 mt-1 flex items-center justify-center gap-1">
+          <div className="text-lg font-mono font-bold text-on-surface">{formatPower(diesel)}</div>
+          <div className="text-[10px] text-outline mt-1 flex items-center justify-center gap-1">
             <div className={`w-1.5 h-1.5 rounded-full ${diesel > 0 ? 'bg-red-500 animate-pulse' : 'bg-slate-600'}`}></div>
             {diesel > 0 ? 'Running' : 'Standby Reserve'}
           </div>
@@ -104,13 +104,13 @@ function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any 
       </div>
 
       {/* Load */}
-      <div className="absolute bottom-[10%] right-[30%] translate-x-1/2 flex flex-col items-center z-10 w-48">
-        <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-700 w-full text-center shadow-lg border-b-2 border-b-emerald-500">
+      <div className="absolute top-[80%] left-[60%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-10 w-48">
+        <div className="bg-surface p-3 rounded-lg border border-outline w-full text-center shadow-lg border-b-2 border-b-emerald-500">
           <div className="flex items-center justify-center gap-2 text-purple-400 font-bold text-xs tracking-wider mb-2">
             <Zap size={14} /> COMMUNITY DEMAND
           </div>
-          <div className="text-lg font-mono font-bold text-white">{formatPower(load)}</div>
-          <div className="text-[10px] text-slate-400 mt-1">
+          <div className="text-lg font-mono font-bold text-on-surface">{formatPower(load)}</div>
+          <div className="text-[10px] text-outline mt-1">
             190 Homes • Clinic • Pumps
           </div>
         </div>
@@ -129,14 +129,14 @@ function EnergyFlowDiagram({ data, formatPower }: { data: any, formatPower: any 
 
 function KpiCard({ title, value, subValue, icon: Icon, colorClass, highlight }: any) {
   return (
-    <Card className="bg-slate-900/80 border-slate-800 hover:bg-slate-800/80 transition-colors">
+    <Card className="bg-surface/80 border-outline-variant hover:bg-surface-container/80 transition-colors">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xs font-bold text-slate-400 tracking-wider uppercase">{title}</CardTitle>
+        <CardTitle className="text-xs font-bold text-outline tracking-wider uppercase">{title}</CardTitle>
         <Icon className={cn("h-4 w-4", colorClass)} />
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-white">{value}</div>
-        <p className={cn("text-[11px] mt-1 font-medium", highlight ? "text-emerald-400" : "text-slate-500")}>
+        <div className="text-2xl font-bold text-on-surface">{value}</div>
+        <p className={cn("text-[11px] mt-1 font-medium", highlight ? "text-emerald-400" : "text-outline")}>
           {highlight && <TrendingUp size={10} className="inline mr-1" />}
           {subValue}
         </p>
@@ -147,8 +147,12 @@ function KpiCard({ title, value, subValue, icon: Icon, colorClass, highlight }: 
 
 export default function OverviewPage() {
   const router = useRouter();
-  const { currency, powerScale, formatCurrency, formatPower } = useSettings();
+  const { currency, powerScale, formatCurrency, formatPower, locationId } = useSettings();
   
+  const currentLoc = LOCATIONS.find(l => l.id === locationId);
+  const locScale = currentLoc ? currentLoc.scale : 1.0;
+  const locName = currentLoc ? currentLoc.name.split(' (')[0] : 'Microgrid';
+
   // Real-time moving data
   const [liveData, setLiveData] = useState({
     solar: 145.2,
@@ -185,12 +189,21 @@ export default function OverviewPage() {
       
       initial.push({
         time: `${hour.toString().padStart(2, '0')}:00`,
-        Solar: Math.max(0, s),
-        Wind: w,
-        Diesel: s + w < l ? Math.min(20, l - (s + w)) : 0, // Very little diesel
+        Solar: Math.max(0, s) * locScale,
+        Wind: w * locScale,
+        Diesel: (s + w < l ? Math.min(20, l - (s + w)) : 0) * (2 - locScale), // Very little diesel
       });
     }
     setGraphData(initial);
+
+    // Reset base live data instantly to match the new location
+    setLiveData({
+      solar: 145.2 * locScale,
+      wind: 84.4 * locScale,
+      battery: -35.6 * locScale,
+      diesel: 0,
+      load: 194.0 * Math.max(0.7, locScale)
+    });
 
     // Live ticker
     const interval = setInterval(() => {
@@ -220,7 +233,7 @@ export default function OverviewPage() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [locScale]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -228,13 +241,13 @@ export default function OverviewPage() {
       {/* Top Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+          <h2 className="text-2xl font-bold tracking-tight text-on-surface flex items-center gap-3">
             Executive Overview 
             <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider">
-              Kutch Rural Microgrid
+              {locName}
             </span>
           </h2>
-          <p className="text-slate-400 text-sm mt-1">Real-time renewable dispatch, battery storage state of charge, and avoided diesel emissions</p>
+          <p className="text-outline text-sm mt-1">Real-time renewable dispatch, battery storage state of charge, and avoided diesel emissions</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -246,7 +259,7 @@ export default function OverviewPage() {
           </button>
           <button 
             onClick={() => router.push('/demand')}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-md transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-surface-container hover:bg-slate-700 text-on-surface border border-outline font-bold text-xs rounded-md transition-all flex items-center gap-2"
           >
             <Zap size={14} /> Fuel & Demand
           </button>
@@ -264,18 +277,18 @@ export default function OverviewPage() {
       </div>
 
       {/* Main Flow Diagram */}
-      <Card className="bg-slate-900/50 border-slate-800">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-slate-800/50">
+      <Card className="bg-surface/50 border-outline-variant">
+        <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-outline-variant">
           <div>
-            <CardTitle className="text-sm font-bold text-white flex items-center gap-2">
+            <CardTitle className="text-sm font-bold text-on-surface flex items-center gap-2">
               Live Microgrid Bus & Power Flow
               <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 tracking-wider">
                 SYNCED 50.02 Hz
               </span>
             </CardTitle>
-            <p className="text-[11px] text-slate-500 mt-1">Dynamic SVG power transmission animated by real-time telemetry magnitude and flow direction</p>
+            <p className="text-[11px] text-outline mt-1">Dynamic SVG power transmission animated by real-time telemetry magnitude and flow direction</p>
           </div>
-          <div className="text-xs text-slate-400">
+          <div className="text-xs text-outline">
             <span className="font-bold text-emerald-400 mr-2">Renewable: 36.1%</span> | <span className="ml-2 font-mono">Bus: 404.5 V</span>
           </div>
         </CardHeader>
@@ -283,7 +296,7 @@ export default function OverviewPage() {
           <EnergyFlowDiagram data={liveData} formatPower={formatPower} />
           
           <div className="flex justify-between items-center mt-4">
-            <div className="flex items-center gap-4 text-[10px] text-slate-400 font-medium tracking-wide">
+            <div className="flex items-center gap-4 text-[10px] text-outline font-medium tracking-wide">
               <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Green: Renewable generation</span>
               <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-indigo-500"></div> Teal: BESS storage</span>
               <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-red-500"></div> Red: Diesel backup</span>
@@ -300,13 +313,13 @@ export default function OverviewPage() {
       <div className="grid gap-4 grid-cols-1 xl:grid-cols-3">
         
         {/* Left: Area Chart */}
-        <Card className="col-span-2 bg-slate-900/50 border-slate-800">
+        <Card className="col-span-2 bg-surface/50 border-outline-variant">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-sm font-bold text-white">Dispatch Trajectory (Today's Profile)</CardTitle>
+              <CardTitle className="text-sm font-bold text-on-surface">Dispatch Trajectory (Today's Profile)</CardTitle>
               <Link href="/dispatch" className="text-xs text-emerald-400 hover:text-emerald-300 font-bold">Full Dispatch →</Link>
             </div>
-            <p className="text-[11px] text-slate-500">Hourly multi-source power balance: Solar, Wind, BESS, Diesel vs Demand</p>
+            <p className="text-[11px] text-outline">Hourly multi-source power balance: Solar, Wind, BESS, Diesel vs Demand</p>
           </CardHeader>
           <CardContent className="pt-4 h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -325,11 +338,11 @@ export default function OverviewPage() {
                     <stop offset="95%" stopColor="#f87171" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="time" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => formatPower(val)} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                 <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', fontSize: '12px' }}
+                  contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px' }}
                   itemStyle={{ fontWeight: 'bold' }}
                 />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
@@ -342,19 +355,18 @@ export default function OverviewPage() {
         </Card>
         
         {/* Right: AI Energy Intelligence */}
-        <Card className="col-span-1 bg-slate-900/50 border-slate-800 flex flex-col">
+        <Card className="col-span-1 bg-surface/50 border-outline-variant flex flex-col">
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <CardTitle className="text-sm font-bold text-emerald-400 flex items-center gap-2">
                 <Activity size={16} /> AI Energy Intelligence
               </CardTitle>
-              <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700">Gemini 2.0</span>
             </div>
           </CardHeader>
-          <CardContent className="pt-4 flex-1 flex flex-col justify-between text-sm text-slate-300">
+          <CardContent className="pt-4 flex-1 flex flex-col justify-between text-sm text-on-surface-variant">
             <div className="space-y-4">
               <p className="leading-relaxed">
-                Operating in high-efficiency renewable mode. Solar and wind are presently meeting <span className="text-white font-bold">40.9%</span> of community load. The battery is functioning within its healthy 20-95% lifecycle envelope. Keep diesel in automated standby.
+                Operating in high-efficiency renewable mode. Solar and wind are presently meeting <span className="text-on-surface font-bold">40.9%</span> of community load. The battery is functioning within its healthy 20-95% lifecycle envelope. Keep diesel in automated standby.
               </p>
               
               <ul className="space-y-2 mt-4">
@@ -375,7 +387,7 @@ export default function OverviewPage() {
 
             <button 
               onClick={() => router.push('/optimizer')}
-              className="mt-6 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-slate-700 transition-colors"
+              className="mt-6 w-full py-2.5 bg-surface-container hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-outline transition-colors"
             >
               Review LP Mathematical Formulation →
             </button>
