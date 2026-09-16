@@ -181,6 +181,7 @@ Open http://localhost:3000 in your browser.
 
 📸 Screenshots
 
+
 ### Homepage / Live SCADA
 ![Live SCADA Executive Overview](./docs/scada.png)
 
@@ -188,10 +189,16 @@ Open http://localhost:3000 in your browser.
 ![AI Grid Optimizer Breakdown](./docs/optimizer.png)
 
 ### Cost Analytics
-![Cost and Carbon Emissions](./docs/cost.png)
+![Cost and Carbon Emissions](./docs/cost_revenue_generation.png)
 
 ### Weather Integration
-![Renewable Generation Forecast](./docs/weather.png)
+![Renewable Generation Forecast](./docs/weather_renewable_generation.png)
+
+### Battery Management
+![Battery State of Charge and Health](./docs/battery_management.png)
+
+### Demand Analysis
+![Power Demand Analysis](./docs/power_demand.png)
 
 👨💻 Team Members
 Daksh Kevadiya - GitHub Profile: https://github.com/dakshkevadiya
