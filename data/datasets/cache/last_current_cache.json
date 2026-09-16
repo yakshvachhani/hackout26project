@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-09-16T12:01:26.950987+00:00",
+  "source": "LIVE",
+  "provider": "Open-Meteo",
+  "condition": "Dense Drizzle",
+  "temperature_c": 26.1,
+  "solar_irradiance_wm2": 203.2,
+  "wind_speed_ms": 18.0,
+  "cloud_cover_pct": 36.0,
+  "advisory": null,
+  "latitude": 18.15,
+  "longitude": 74.58
+}
