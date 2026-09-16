@@ -189,7 +189,7 @@ Open http://localhost:3000 in your browser.
 ![AI Grid Optimizer Breakdown](./docs/optimizer.png)
 
 ### Cost Analytics
-![Cost and Carbon Emissions](./docs/cost_revenue_generation.png)
+![Cost and Carbon Emissions](./docs/cost.png)
 
 ### Weather Integration
 ![Renewable Generation Forecast](./docs/weather_renewable_generation.png)
