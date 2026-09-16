@@ -8,7 +8,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 export default function OptimizerPage() {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [hasRun, setHasRun] = useState(false);
-  
+
   // Slider states matching screenshot
   const [priority, setPriority] = useState('Balanced');
   const [reliability, setReliability] = useState('High');
@@ -16,7 +16,7 @@ export default function OptimizerPage() {
   const [minReserve, setMinReserve] = useState(20);
   const [carbonPrice, setCarbonPrice] = useState(1000);
   const [horizon, setHorizon] = useState('48h');
-  
+
   const [solverTime, setSolverTime] = useState(0);
 
   // Results State
@@ -28,24 +28,24 @@ export default function OptimizerPage() {
     carbon: 0,
     baseCarbon: 5718.5,
     pieData: [
-      { name: 'Solar PV', value: 61, color: '#f59e0b' },
-      { name: 'Wind Mast', value: 17, color: '#3b82f6' },
-      { name: 'Battery BESS', value: 14, color: '#10b981' },
-      { name: 'Diesel Backup', value: 8, color: '#ef4444' },
-    ]
+    { name: 'Solar PV', value: 61, color: '#f59e0b' },
+    { name: 'Wind Mast', value: 17, color: '#3b82f6' },
+    { name: 'Battery BESS', value: 14, color: '#10b981' },
+    { name: 'Diesel Backup', value: 8, color: '#ef4444' }]
+
   });
 
   const runOptimization = async () => {
     setIsOptimizing(true);
     const startTime = performance.now();
-    
+
     try {
       // Fetch live optimization plan from Python Backend
       const response = await fetch('http://localhost:8000/api/optimize?grid_id=1', {
-        method: 'POST',
+        method: 'POST'
       });
       const data = await response.json();
-      
+
       if (!response.ok || !data.dispatch_plan) {
         console.error('Optimization failed:', data);
         setIsOptimizing(false);
@@ -54,46 +54,46 @@ export default function OptimizerPage() {
       }
 
       // Calculate real totals from the Live 24h API Dispatch array
-      let solarSum = 0, windSum = 0, battSum = 0, dieselSum = 0;
-      data.dispatch_plan.forEach((h: any) => {
+      let solarSum = 0,windSum = 0,battSum = 0,dieselSum = 0;
+      data.dispatch_plan.forEach((h) => {
         solarSum += h.solar;
         windSum += h.wind;
         battSum += h.batt_dis;
         dieselSum += h.diesel;
       });
-      
+
       const totalGen = solarSum + windSum + battSum + dieselSum || 1; // avoid /0
 
       // Calculate synthetic frontend overrides so the sliders physically change the numbers
       // The API sometimes returns 0 diesel if fully renewable, so we use a synthetic baseline
-      const horizonMult = (horizon === '48h' ? 2 : horizon === '72h' ? 3 : 1);
-      
+      const horizonMult = horizon === '48h' ? 2 : horizon === '72h' ? 3 : 1;
+
       let syntheticDiesel = dieselSum > 0 ? dieselSum : 185; // Base L for 24h
-      
+
       // 1. Min Reserve: higher reserve = battery can't discharge as deep = MORE diesel needed
-      syntheticDiesel += (minReserve - 20) * 12.5; 
+      syntheticDiesel += (minReserve - 20) * 12.5;
       // 2. Diesel Price: higher price = optimizer avoids diesel
       syntheticDiesel -= (dieselPrice - 92) * 1.5;
       // 3. Carbon Price: higher penalty = optimizer avoids diesel
       syntheticDiesel -= (carbonPrice - 1000) * 0.05;
-      
+
       // Priority overrides
       if (priority === 'Emissions') syntheticDiesel *= 0.5;
       if (priority === 'Cost') syntheticDiesel *= 1.3;
-      
+
       if (syntheticDiesel < 0) syntheticDiesel = 0;
-      
+
       const finalDiesel = syntheticDiesel * horizonMult;
       const finalCarbon = finalDiesel * 2.68;
-      
+
       // Calculate precise financial costs based on the exact slider prices!
       const fixedOpCost = 8500 * horizonMult;
-      const finalCost = fixedOpCost + (finalDiesel * dieselPrice) + (finalCarbon * (carbonPrice / 1000));
-      
+      const finalCost = fixedOpCost + finalDiesel * dieselPrice + finalCarbon * (carbonPrice / 1000);
+
       // Baseline math (100% diesel scenario)
       const finalBaseDiesel = 2133.0 * horizonMult;
       const finalBaseCarbon = finalBaseDiesel * 2.68;
-      const finalBaseCost = fixedOpCost + (finalBaseDiesel * dieselPrice) + (finalBaseCarbon * (carbonPrice / 1000));
+      const finalBaseCost = fixedOpCost + finalBaseDiesel * dieselPrice + finalBaseCarbon * (carbonPrice / 1000);
 
       // Calculate Pie Chart proportions
       const effectiveTotalGen = solarSum + windSum + battSum + syntheticDiesel || 1;
@@ -106,18 +106,18 @@ export default function OptimizerPage() {
         carbon: finalCarbon,
         baseCarbon: finalBaseCarbon,
         pieData: [
-          { name: 'Solar PV', value: (solarSum/effectiveTotalGen)*100, color: '#f59e0b' },
-          { name: 'Wind Mast', value: (windSum/effectiveTotalGen)*100, color: '#3b82f6' },
-          { name: 'Battery BESS', value: (battSum/effectiveTotalGen)*100, color: '#10b981' },
-          { name: 'Diesel Backup', value: (syntheticDiesel/effectiveTotalGen)*100, color: '#ef4444' },
-        ]
+        { name: 'Solar PV', value: solarSum / effectiveTotalGen * 100, color: '#f59e0b' },
+        { name: 'Wind Mast', value: windSum / effectiveTotalGen * 100, color: '#3b82f6' },
+        { name: 'Battery BESS', value: battSum / effectiveTotalGen * 100, color: '#10b981' },
+        { name: 'Diesel Backup', value: syntheticDiesel / effectiveTotalGen * 100, color: '#ef4444' }]
+
       });
-      
+
     } catch (e) {
       console.error(e);
       // Fallback dummy data if backend fails
     }
-    
+
     const endTime = performance.now();
     setSolverTime(Math.round(endTime - startTime + 80)); // Add a little offset to look like matrix solving
     setIsOptimizing(false);
@@ -130,7 +130,7 @@ export default function OptimizerPage() {
   }, []);
 
   const savingsCost = stats.baseCost - stats.cost;
-  const savingsCostPct = ((savingsCost / stats.baseCost) * 100).toFixed(1);
+  const savingsCostPct = (savingsCost / stats.baseCost * 100).toFixed(1);
 
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto pb-12">
@@ -146,16 +146,16 @@ export default function OptimizerPage() {
           </div>
           <p className="text-outline text-sm">Multi-period dispatch optimization minimizing fuel spending, battery degradation, and carbon penalties</p>
         </div>
-        <button 
+        <button
           onClick={runOptimization}
           disabled={isOptimizing}
-          className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50 shadow-lg shadow-emerald-500/20"
-        >
-          {isOptimizing ? (
-            <span className="animate-pulse">Solving...</span>
-          ) : (
-            <><Play size={16} fill="currentColor" /> Run Optimization</>
-          )}
+          className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50 shadow-lg shadow-emerald-500/20">
+          
+          {isOptimizing ?
+          <span className="animate-pulse">Solving...</span> :
+
+          <><Play size={16} fill="currentColor" /> Run Optimization</>
+          }
         </button>
       </div>
 
@@ -182,15 +182,15 @@ export default function OptimizerPage() {
                   <span className="text-emerald-500 font-bold">{priority}</span>
                 </div>
                 <div className="flex bg-surface-container rounded-lg p-1 border border-outline/50">
-                  {['Cost', 'Balanced', 'Emissions'].map(opt => (
-                    <button 
-                      key={opt}
-                      onClick={() => setPriority(opt)}
-                      className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${priority === opt ? 'bg-surface text-emerald-500 border border-emerald-500/30' : 'text-on-surface hover:text-on-surface-variant'}`}
-                    >
+                  {['Cost', 'Balanced', 'Emissions'].map((opt) =>
+                  <button
+                    key={opt}
+                    onClick={() => setPriority(opt)}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${priority === opt ? 'bg-surface text-emerald-500 border border-emerald-500/30' : 'text-on-surface hover:text-on-surface-variant'}`}>
+                    
                       {opt}
                     </button>
-                  ))}
+                  )}
                 </div>
                 <p className="text-[10px] text-on-surface mt-2">Balances fuel expenditure against carbon shadow price</p>
               </div>
@@ -202,15 +202,15 @@ export default function OptimizerPage() {
                   <span className="text-blue-400 font-bold uppercase">{reliability}</span>
                 </div>
                 <div className="flex bg-surface-container rounded-lg p-1 border border-outline/50">
-                  {['Normal', 'High', 'Critical'].map(opt => (
-                    <button 
-                      key={opt}
-                      onClick={() => setReliability(opt)}
-                      className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${reliability === opt ? 'bg-surface text-blue-400 border border-blue-500/30' : 'text-on-surface hover:text-on-surface-variant'}`}
-                    >
+                  {['Normal', 'High', 'Critical'].map((opt) =>
+                  <button
+                    key={opt}
+                    onClick={() => setReliability(opt)}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${reliability === opt ? 'bg-surface text-blue-400 border border-blue-500/30' : 'text-on-surface hover:text-on-surface-variant'}`}>
+                    
                       {opt}
                     </button>
-                  ))}
+                  )}
                 </div>
                 <p className="text-[10px] text-on-surface mt-2">Critical mandates 25% spinning reserve for health clinic</p>
               </div>
@@ -221,12 +221,12 @@ export default function OptimizerPage() {
                   <span className="text-outline font-bold">Diesel Fuel Price</span>
                   <span className="text-amber-500 font-bold">₹{dieselPrice}/L</span>
                 </div>
-                <input 
-                  type="range" min="60" max="160" 
-                  value={dieselPrice} 
-                  onChange={(e) => setDieselPrice(Number(e.target.value))} 
-                  className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" 
-                />
+                <input
+                  type="range" min="60" max="160"
+                  value={dieselPrice}
+                  onChange={(e) => setDieselPrice(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" />
+                
                 <div className="flex justify-between text-[10px] text-on-surface mt-2">
                   <span>₹60</span>
                   <span>Subsidized vs Market</span>
@@ -240,12 +240,12 @@ export default function OptimizerPage() {
                   <span className="text-outline font-bold">Minimum Battery Reserve</span>
                   <span className="text-emerald-500 font-bold">{minReserve}%</span>
                 </div>
-                <input 
-                  type="range" min="10" max="40" 
-                  value={minReserve} 
-                  onChange={(e) => setMinReserve(Number(e.target.value))} 
-                  className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" 
-                />
+                <input
+                  type="range" min="10" max="40"
+                  value={minReserve}
+                  onChange={(e) => setMinReserve(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
+                
                 <div className="flex justify-between text-[10px] text-on-surface mt-2">
                   <span>10% (Deep cycle)</span>
                   <span>Protects cells</span>
@@ -259,12 +259,12 @@ export default function OptimizerPage() {
                   <span className="text-outline font-bold">Carbon Penalty Price</span>
                   <span className="text-emerald-500 font-bold">₹{carbonPrice}/t CO₂</span>
                 </div>
-                <input 
+                <input
                   type="range" min="500" max="4000" step="100"
-                  value={carbonPrice} 
-                  onChange={(e) => setCarbonPrice(Number(e.target.value))} 
-                  className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" 
-                />
+                  value={carbonPrice}
+                  onChange={(e) => setCarbonPrice(Number(e.target.value))}
+                  className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
+                
                 <div className="flex justify-between text-[10px] text-on-surface mt-2">
                   <span>₹500/t</span>
                   <span>Green Credit Shadow Tax</span>
@@ -279,15 +279,15 @@ export default function OptimizerPage() {
                   <span className="text-purple-400 font-bold">{horizon} Hours</span>
                 </div>
                 <div className="flex bg-surface-container rounded-lg p-1 border border-outline/50">
-                  {['24h', '48h', '72h'].map(opt => (
-                    <button 
-                      key={opt}
-                      onClick={() => setHorizon(opt)}
-                      className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${horizon === opt ? 'bg-surface text-purple-400 border border-purple-500/30' : 'text-on-surface hover:text-on-surface-variant'}`}
-                    >
+                  {['24h', '48h', '72h'].map((opt) =>
+                  <button
+                    key={opt}
+                    onClick={() => setHorizon(opt)}
+                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-colors ${horizon === opt ? 'bg-surface text-purple-400 border border-purple-500/30' : 'text-on-surface hover:text-on-surface-variant'}`}>
+                    
                       {opt}
                     </button>
-                  ))}
+                  )}
                 </div>
                 <p className="text-[10px] text-on-surface mt-2">Multi-interval dynamic state of charge horizon</p>
               </div>
@@ -342,8 +342,8 @@ export default function OptimizerPage() {
       </div>
 
       {/* Bottom Grid: Strategy & Dispatch */}
-      {hasRun && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {hasRun &&
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
           
           {/* Strategy Donut Chart */}
           <Card className="lg:col-span-4 bg-surface border-outline-variant rounded-xl">
@@ -356,37 +356,37 @@ export default function OptimizerPage() {
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={stats.pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={85}
-                      stroke="none"
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {stats.pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
+                    data={stats.pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={85}
+                    stroke="none"
+                    paddingAngle={2}
+                    dataKey="value">
+                    
+                      {stats.pieData.map((entry, index) =>
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    )}
                     </Pie>
-                    <Tooltip 
-                      formatter={(val: any) => `${val.toFixed(1)}%`}
-                      contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: '12px' }}
-                      itemStyle={{ color: '#0f172a' }}
-                    />
+                    <Tooltip
+                    formatter={(val) => `${val.toFixed(1)}%`}
+                    contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', color: '#0f172a', fontSize: '12px' }}
+                    itemStyle={{ color: '#0f172a' }} />
+                  
                   </PieChart>
                 </ResponsiveContainer>
               </div>
               <div className="grid grid-cols-2 gap-y-2 mt-2">
-                {stats.pieData.map((d, i) => (
-                  <div key={i} className="flex items-center justify-between text-xs px-2">
+                {stats.pieData.map((d, i) =>
+              <div key={i} className="flex items-center justify-between text-xs px-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }}></div>
                       <span className="text-on-surface-variant">{d.name}:</span>
                     </div>
                     <span className="text-on-surface font-bold">{d.value.toFixed(0)}%</span>
                   </div>
-                ))}
+              )}
               </div>
             </CardContent>
           </Card>
@@ -420,7 +420,7 @@ export default function OptimizerPage() {
                   <span className="text-xs text-outline mb-2">Diesel Consumption</span>
                   <span className="text-xs text-on-surface line-through mb-0.5">{stats.baseDiesel.toLocaleString('en-IN', { maximumFractionDigits: 1 })} L</span>
                   <span className="text-xl font-bold text-amber-500 mb-1">{stats.diesel.toLocaleString('en-IN', { maximumFractionDigits: 1 })} L</span>
-                  <span className="text-[10px] text-emerald-500 font-bold">-{Math.round(((stats.baseDiesel - stats.diesel)/stats.baseDiesel)*100)}% liters</span>
+                  <span className="text-[10px] text-emerald-500 font-bold">-{Math.round((stats.baseDiesel - stats.diesel) / stats.baseDiesel * 100)}% liters</span>
                 </div>
 
                 {/* Carbon Card */}
@@ -460,9 +460,8 @@ export default function OptimizerPage() {
           </Card>
 
         </div>
-      )}
+      }
 
-    </div>
-  );
+    </div>);
+
 }
-

@@ -21,16 +21,16 @@ export default function BatteryIntelligencePage() {
       let val = 60;
       if (i <= 6) {
         // Night: steady discharge from 68% down to 42% (above 20% floor)
-        val = 68 - (i * 4.1);
+        val = 68 - i * 4.1;
       } else if (i <= 14) {
         // Daytime: solar absorption up to 92%
-        val = 43 + ((i - 6) * 6.1);
+        val = 43 + (i - 6) * 6.1;
       } else if (i <= 17) {
         // Late afternoon float
-        val = 92 - ((i - 14) * 1.5);
+        val = 92 - (i - 14) * 1.5;
       } else {
         // Evening peak demand discharge
-        val = 87 - ((i - 17) * 3.1);
+        val = 87 - (i - 17) * 3.1;
       }
       curve.push({
         time: hourStr,
@@ -51,7 +51,7 @@ export default function BatteryIntelligencePage() {
       } else if (i >= 18 && i <= 22) {
         p = Number((22 + Math.sin((i - 18) / 4 * Math.PI) * 26).toFixed(1)); // discharging
       } else {
-        p = Number((6 + (i % 3) * 1.5).toFixed(1)); // baseline
+        p = Number((6 + i % 3 * 1.5).toFixed(1)); // baseline
       }
       curve.push({ time: hourStr, power: p });
     }
@@ -59,43 +59,43 @@ export default function BatteryIntelligencePage() {
   };
 
   // API Data states initialized with default 24h curves so never empty
-  const [socData, setSocData] = useState<any[]>(generateDefaultSocCurve);
-  const [inverterData, setInverterData] = useState<any[]>(generateDefaultInverterCurve);
+  const [socData, setSocData] = useState(generateDefaultSocCurve);
+  const [inverterData, setInverterData] = useState(generateDefaultInverterCurve);
 
   // Projected Degradation Data
   const degradationData = [
-    { cycle: '0 cyc', retention: 100 },
-    { cycle: '500 cyc', retention: 98.2 },
-    { cycle: '1000 cyc', retention: 96.5 },
-    { cycle: '1500 cyc', retention: 94.1 },
-    { cycle: '2000 cyc', retention: 91.8 },
-    { cycle: '2500 cyc', retention: 89.0 },
-    { cycle: '3000 cyc', retention: 85.5 },
-    { cycle: '3500 cyc', retention: 82.1 },
-    { cycle: '4000 cyc', retention: 79.0 },
-  ];
+  { cycle: '0 cyc', retention: 100 },
+  { cycle: '500 cyc', retention: 98.2 },
+  { cycle: '1000 cyc', retention: 96.5 },
+  { cycle: '1500 cyc', retention: 94.1 },
+  { cycle: '2000 cyc', retention: 91.8 },
+  { cycle: '2500 cyc', retention: 89.0 },
+  { cycle: '3000 cyc', retention: 85.5 },
+  { cycle: '3500 cyc', retention: 82.1 },
+  { cycle: '4000 cyc', retention: 79.0 }];
+
 
   useEffect(() => {
     // 1. Fetch API data
     const fetchData = async () => {
       try {
         const [battRes, dispRes] = await Promise.all([
-          fetch('http://localhost:8000/api/battery').catch(() => null),
-          fetch('http://localhost:8000/api/dispatch').catch(() => null)
-        ]);
+        fetch('http://localhost:8000/api/battery').catch(() => null),
+        fetch('http://localhost:8000/api/dispatch').catch(() => null)]
+        );
 
         if (battRes && battRes.ok) {
           const battJson = await battRes.json();
-          let parsedSoc: any[] = [];
+          let parsedSoc = [];
           const history = battJson?.socHistory || battJson?.soc_history;
-          
+
           if (Array.isArray(history) && history.length > 0) {
-            parsedSoc = history.map((d: any) => ({
+            parsedSoc = history.map((d) => ({
               time: d.hour || d.time || `${d.interval || 0}:00`,
               soc: Number(d.soc ?? d.socPercent ?? 50)
             }));
           } else if (Array.isArray(battJson) && battJson.length > 0) {
-            parsedSoc = battJson.map((d: any) => ({
+            parsedSoc = battJson.map((d) => ({
               time: d.hour || d.time || '00:00',
               soc: Number(d.soc ?? 50)
             }));
@@ -113,10 +113,10 @@ export default function BatteryIntelligencePage() {
         if (dispRes && dispRes.ok) {
           const dispJson = await dispRes.json();
           if (Array.isArray(dispJson) && dispJson.length > 0) {
-            const parsedInverter = dispJson.map((d: any) => {
+            const parsedInverter = dispJson.map((d) => {
               const discharge = Number(d.batteryDischarge || 0);
               const charge = Number(d.batteryCharge || 0);
-              const netPower = discharge > 0 ? discharge : (charge < 0 ? charge : -charge);
+              const netPower = discharge > 0 ? discharge : charge < 0 ? charge : -charge;
               return {
                 time: d.time || '00:00',
                 power: Number(netPower.toFixed(1))
@@ -131,22 +131,22 @@ export default function BatteryIntelligencePage() {
         console.error("Failed to fetch battery data", err);
       }
     };
-    
+
     fetchData();
 
     // 2. Real-time fluctuations simulator
     const interval = setInterval(() => {
-      setSoc(prev => {
+      setSoc((prev) => {
         const delta = isDischarging ? -0.01 : 0.01;
         return Number((prev + delta).toFixed(2));
       });
-      
-      setFlow(prev => {
+
+      setFlow((prev) => {
         const jitter = (Math.random() - 0.5) * 0.4;
         return Number((prev + jitter).toFixed(1));
       });
 
-      setTemp(prev => {
+      setTemp((prev) => {
         const jitter = (Math.random() - 0.5) * 0.1;
         return Number((prev + jitter).toFixed(1));
       });
@@ -156,19 +156,19 @@ export default function BatteryIntelligencePage() {
   }, [isDischarging]);
 
   // Custom tooltips
-  const SocTooltip = ({ active, payload, label }: any) => {
+  const SocTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-surface border border-outline p-2 rounded shadow-xl text-xs">
           <span className="text-outline">{label}</span><br />
           <span className="text-emerald-500 font-bold">SOC: {payload[0].value}%</span>
-        </div>
-      );
+        </div>);
+
     }
     return null;
   };
 
-  const InverterTooltip = ({ active, payload, label }: any) => {
+  const InverterTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const val = payload[0].value;
       return (
@@ -177,8 +177,8 @@ export default function BatteryIntelligencePage() {
           <span className={val >= 0 ? "text-emerald-500 font-bold" : "text-amber-400 font-bold"}>
             {val >= 0 ? `Discharging: ${val} kW` : `Charging: ${Math.abs(val)} kW`}
           </span>
-        </div>
-      );
+        </div>);
+
     }
     return null;
   };
@@ -287,8 +287,8 @@ export default function BatteryIntelligencePage() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={socData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} dy={10} minTickGap={20} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} domain={[0, 100]} tickFormatter={v => `${v}%`} />
+                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} dy={10} minTickGap={20} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                 <Tooltip content={<SocTooltip />} cursor={{ stroke: '#64748b', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 
                 <ReferenceLine y={20} stroke="#ef4444" strokeWidth={1.5} strokeDasharray="3 3" label={{ position: 'insideBottomRight', value: 'Reserve Floor (20%)', fill: '#ef4444', fontSize: 10, fontWeight: 'bold' }} />
@@ -298,8 +298,8 @@ export default function BatteryIntelligencePage() {
                 
                 <defs>
                   <linearGradient id="colorSoc" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.35}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.02}/>
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
               </AreaChart>
@@ -322,8 +322,8 @@ export default function BatteryIntelligencePage() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={inverterData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.08)" />
-                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} dy={10} minTickGap={20} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 10}} domain={[-60, 100]} tickFormatter={v => `${v} kW`} />
+                <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} dy={10} minTickGap={20} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} domain={[-60, 100]} tickFormatter={(v) => `${v} kW`} />
                 <Tooltip content={<InverterTooltip />} cursor={{ stroke: '#64748b', strokeWidth: 1, strokeDasharray: '4 4' }} />
                 
                 <ReferenceLine y={0} stroke="#64748b" strokeOpacity={0.6} />
@@ -332,9 +332,9 @@ export default function BatteryIntelligencePage() {
                 
                 <defs>
                   <linearGradient id="colorPower" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35}/>
-                    <stop offset="50%" stopColor="#3b82f6" stopOpacity={0.0}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.35}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
+                    <stop offset="50%" stopColor="#3b82f6" stopOpacity={0.0} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.35} />
                   </linearGradient>
                 </defs>
               </AreaChart>
@@ -362,12 +362,12 @@ export default function BatteryIntelligencePage() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={degradationData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                <XAxis dataKey="cycle" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 10}} domain={[70, 100]} tickFormatter={v => `${v}%`} />
-                <Tooltip 
+                <XAxis dataKey="cycle" axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 10 }} domain={[70, 100]} tickFormatter={(v) => `${v}%`} />
+                <Tooltip
                   contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px' }}
-                  itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
-                />
+                  itemStyle={{ color: '#10b981', fontWeight: 'bold' }} />
+                
                 
                 <ReferenceLine y={80} stroke="#ef4444" strokeDasharray="3 3" label={{ position: 'insideBottomRight', value: '80% Warranty Floor', fill: '#ef4444', fontSize: 10 }} />
                 
@@ -412,7 +412,6 @@ export default function BatteryIntelligencePage() {
 
       </div>
 
-    </div>
-  );
-}
+    </div>);
 
+}

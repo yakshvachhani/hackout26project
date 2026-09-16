@@ -4,39 +4,39 @@ import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity, ShieldCheck, Sun, Zap } from 'lucide-react';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area
-} from 'recharts';
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, AreaChart, Area } from
+'recharts';
 
 export default function AnalyticsPage() {
   const { currency, powerScale } = useSettings();
   const [range, setRange] = useState('30d');
 
-  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [historyData, setHistoryData] = useState([]);
 
   React.useEffect(() => {
     const days = range === '7d' ? 7 : range === '90d' ? 90 : 30;
-    fetch(`http://localhost:8000/api/analytics?days=${days}`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setHistoryData(data);
-        } else {
-          throw new Error('No data');
-        }
-      })
-      .catch(() => {
-        const fallback = [];
-        for (let i = 1; i <= days; i++) {
-          fallback.push({
-            day: `Day ${i}`,
-            uptime: parseFloat((95 + Math.random() * 5).toFixed(1)),
-            renewablePenetration: parseFloat((60 + Math.random() * 30).toFixed(1)),
-            dieselDependency: parseFloat((10 + Math.random() * 15).toFixed(1)),
-          });
-        }
-        setHistoryData(fallback);
-      });
+    fetch(`http://localhost:8000/api/analytics?days=${days}`).
+    then((res) => res.json()).
+    then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setHistoryData(data);
+      } else {
+        throw new Error('No data');
+      }
+    }).
+    catch(() => {
+      const fallback = [];
+      for (let i = 1; i <= days; i++) {
+        fallback.push({
+          day: `Day ${i}`,
+          uptime: parseFloat((95 + Math.random() * 5).toFixed(1)),
+          renewablePenetration: parseFloat((60 + Math.random() * 30).toFixed(1)),
+          dieselDependency: parseFloat((10 + Math.random() * 15).toFixed(1))
+        });
+      }
+      setHistoryData(fallback);
+    });
   }, [range]);
 
   // Calculate dynamic KPIs from DB
@@ -52,15 +52,15 @@ export default function AnalyticsPage() {
           <p className="text-outline">Performance, reliability, and uptime metrics over time.</p>
         </div>
         <div className="flex items-center bg-surface-container rounded-lg p-1 border border-outline-variant">
-          {['7d', '30d', '90d'].map((r) => (
-            <button 
-              key={r}
-              onClick={() => setRange(r)}
-              className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${range === r ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
-            >
+          {['7d', '30d', '90d'].map((r) =>
+          <button
+            key={r}
+            onClick={() => setRange(r)}
+            className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${range === r ? 'bg-surface text-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}>
+            
               {r}
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -122,8 +122,8 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
-                  <XAxis dataKey="day" stroke="#94a3b8" tick={{fontSize: 10}} interval={4} />
-                  <YAxis stroke="#94a3b8" tick={{fontSize: 12}} />
+                  <XAxis dataKey="day" stroke="#94a3b8" tick={{ fontSize: 10 }} interval={4} />
+                  <YAxis stroke="#94a3b8" tick={{ fontSize: 12 }} />
                   <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} />
                   <Legend />
                   <Line type="monotone" dataKey="renewablePenetration" stroke="#10b981" strokeWidth={2} dot={false} name="Renewable %" />
@@ -144,8 +144,8 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
-                  <XAxis dataKey="day" stroke="#94a3b8" tick={{fontSize: 10}} interval={4} />
-                  <YAxis stroke="#94a3b8" domain={[90, 100]} tick={{fontSize: 12}} />
+                  <XAxis dataKey="day" stroke="#94a3b8" tick={{ fontSize: 10 }} interval={4} />
+                  <YAxis stroke="#94a3b8" domain={[90, 100]} tick={{ fontSize: 12 }} />
                   <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} />
                   <Legend />
                   <Area type="monotone" dataKey="uptime" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.2} name="Uptime %" />
@@ -156,7 +156,6 @@ export default function AnalyticsPage() {
         </Card>
 
       </div>
-    </div>
-  );
-}
+    </div>);
 
+}

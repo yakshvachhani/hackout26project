@@ -1,59 +1,32 @@
-from typing import List
+from typing import List, Optional
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from backend.database.database import get_db
 from backend.database.models import AlertRecord
 from backend.schemas.alerts import AlertItem
+from backend.services.alert_service import alert_service
 from backend.websocket.manager import ws_manager
 
 router = APIRouter(tags=["Alerts & Notifications"])
 
 
 @router.get("/alerts", response_model=List[AlertItem])
-async def get_alerts(db: Session = Depends(get_db)):
-    """Returns all active microgrid telemetry and dispatch alerts."""
-    records = db.query(AlertRecord).order_by(AlertRecord.timestamp.desc()).all()
-    if not records:
-        return [
-            AlertItem(
-                id=1,
-                type="SUCCESS",
-                title="Optimization Run Complete",
-                message="System operating normally with 86.5% renewable penetration.",
-                timestamp="10:45 AM",
-                read=False
-            ),
-            AlertItem(
-                id=2,
-                type="INFO",
-                title="Solar Peak Window",
-                message="Solar irradiance peak reaching 820 W/m². Battery charging active.",
-                timestamp="10:30 AM",
-                read=False
-            ),
-            AlertItem(
-                id=3,
-                type="WARNING",
-                title="Storm Advisory",
-                message="High wind and storm predicted in 18 hours. Consider Storm Reserve mode.",
-                timestamp="09:15 AM",
-                read=False
-            )
-        ]
-
-    return [
-        AlertItem(
-            id=r.id,
-            type=r.type,
-            title=r.title,
-            message=r.message,
-            timestamp=r.time_str or r.timestamp.strftime("%I:%M %p"),
-            read=r.read
-        )
-        for r in records
-    ]
+async def get_alerts(
+    location_id: Optional[str] = Query(None, description="Active microgrid location ID"),
+    mode: Optional[str] = Query("LIVE", description="Grid operational mode (LIVE or SIMULATION)"),
+    scenario: Optional[str] = Query("nominal", description="Simulation scenario if applicable"),
+    db: Session = Depends(get_db)
+):
+    """Returns dynamically evaluated microgrid telemetry, weather forecast, and dispatch alerts."""
+    live_alerts = await alert_service.generate_live_alerts(
+        db=db,
+        location_id=location_id,
+        mode=mode,
+        scenario=scenario,
+    )
+    return live_alerts
 
 
 @router.post("/alerts", response_model=AlertItem)

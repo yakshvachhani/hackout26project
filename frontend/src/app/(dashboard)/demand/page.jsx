@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
+import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
-} from 'recharts';
+  PieChart, Pie, Cell } from
+'recharts';
 import { AlertTriangle, Home, HeartPulse, Droplet, Store, GraduationCap, Lightbulb, SlidersHorizontal } from 'lucide-react';
 
 export default function DemandPage() {
@@ -18,7 +18,7 @@ export default function DemandPage() {
     schools: 5,
     lighting: 88
   });
-  
+
   const [spikeActive, setSpikeActive] = useState(false);
 
   // Peak Load Multipliers (kW per unit)
@@ -38,7 +38,7 @@ export default function DemandPage() {
     pumps: Math.round(counts.pumps * multipliers.pumps),
     shops: Math.round(counts.shops * multipliers.shops),
     schools: Math.round(counts.schools * multipliers.schools),
-    lighting: Math.round(counts.lighting * multipliers.lighting),
+    lighting: Math.round(counts.lighting * multipliers.lighting)
   };
 
   const totalPeakLoad = Object.values(peaks).reduce((a, b) => a + b, 0);
@@ -47,14 +47,14 @@ export default function DemandPage() {
   const data = [];
   for (let i = 0; i < 24; i++) {
     const time = `${i.toString().padStart(2, '0')}:00`;
-    
+
     // Usage factors based on time of day
-    let hFactor = (i > 5 && i < 9) ? 0.7 : (i > 17 && i < 23) ? 1.0 : 0.3;
+    let hFactor = i > 5 && i < 9 ? 0.7 : i > 17 && i < 23 ? 1.0 : 0.3;
     let cFactor = 1.0; // Clinic always on
-    let pFactor = (i > 6 && i < 16) ? 0.8 : 0.1;
-    let sFactor = (i > 8 && i < 20) ? 0.9 : 0.1;
-    let scFactor = (i > 7 && i < 15) ? 1.0 : 0.05;
-    let lFactor = (i < 6 || i > 18) ? 1.0 : 0.0;
+    let pFactor = i > 6 && i < 16 ? 0.8 : 0.1;
+    let sFactor = i > 8 && i < 20 ? 0.9 : 0.1;
+    let scFactor = i > 7 && i < 15 ? 1.0 : 0.05;
+    let lFactor = i < 6 || i > 18 ? 1.0 : 0.0;
 
     // Apply simulation spike at 18:00
     if (spikeActive && i === 18) {
@@ -63,12 +63,12 @@ export default function DemandPage() {
     }
 
     const critical = peaks.clinic * cFactor;
-    const total = critical + 
-      (peaks.homes * hFactor) + 
-      (peaks.pumps * pFactor) + 
-      (peaks.shops * sFactor) + 
-      (peaks.schools * scFactor) + 
-      (peaks.lighting * lFactor);
+    const total = critical +
+    peaks.homes * hFactor +
+    peaks.pumps * pFactor +
+    peaks.shops * sFactor +
+    peaks.schools * scFactor +
+    peaks.lighting * lFactor;
 
     data.push({
       time,
@@ -79,16 +79,16 @@ export default function DemandPage() {
 
   // Pie Chart Data
   const pieData = [
-    { name: 'Residential', count: `${counts.homes} Homes`, value: peaks.homes, color: '#a855f7' },
-    { name: 'Agricultural Pumps', count: `${counts.pumps}x`, value: peaks.pumps, color: '#3b82f6' },
-    { name: 'Primary Clinic', count: 'Critical', value: peaks.clinic, color: '#ef4444' },
-    { name: 'Commercial Shops', count: `${counts.shops}x`, value: peaks.shops, color: '#eab308' },
-    { name: 'Schools', count: `${counts.schools}x`, value: peaks.schools, color: '#10b981' },
-    { name: 'Lighting', count: `${counts.lighting}x`, value: peaks.lighting, color: '#94a3b8' },
-  ].filter(d => d.value > 0);
+  { name: 'Residential', count: `${counts.homes} Homes`, value: peaks.homes, color: '#a855f7' },
+  { name: 'Agricultural Pumps', count: `${counts.pumps}x`, value: peaks.pumps, color: '#3b82f6' },
+  { name: 'Primary Clinic', count: 'Critical', value: peaks.clinic, color: '#ef4444' },
+  { name: 'Commercial Shops', count: `${counts.shops}x`, value: peaks.shops, color: '#eab308' },
+  { name: 'Schools', count: `${counts.schools}x`, value: peaks.schools, color: '#10b981' },
+  { name: 'Lighting', count: `${counts.lighting}x`, value: peaks.lighting, color: '#94a3b8' }].
+  filter((d) => d.value > 0);
 
-  const handleSlider = (key: keyof typeof counts, value: string) => {
-    setCounts(prev => ({ ...prev, [key]: parseInt(value) || 0 }));
+  const handleSlider = (key, value) => {
+    setCounts((prev) => ({ ...prev, [key]: parseInt(value) || 0 }));
   };
 
   const triggerSpike = () => {
@@ -109,11 +109,11 @@ export default function DemandPage() {
           </div>
           <p className="text-outline mt-1 text-sm">Configurable community circuits, critical healthcare load isolation, and demand surge stress testing</p>
         </div>
-        <button 
+        <button
           onClick={triggerSpike}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all text-sm
-            ${spikeActive ? 'bg-red-500 text-on-surface' : 'bg-surface-container text-on-surface-variant hover:bg-slate-700 border border-outline'}`}
-        >
+            ${spikeActive ? 'bg-red-500 text-on-surface' : 'bg-surface-container text-on-surface-variant hover:bg-slate-700 border border-outline'}`}>
+          
           <AlertTriangle size={16} />
           Simulate 18:00 Demand Spike
         </button>
@@ -124,7 +124,7 @@ export default function DemandPage() {
         <CardHeader className="pb-2 border-b border-outline-variant">
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2 text-base text-on-surface">
-              <SlidersHorizontal size={16} className="text-purple-400"/> Community Circuit Configuration
+              <SlidersHorizontal size={16} className="text-purple-400" /> Community Circuit Configuration
             </CardTitle>
             <div className="text-sm">
               <span className="text-outline">Total Peak Load: </span>
@@ -139,12 +139,12 @@ export default function DemandPage() {
             <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-purple-400 text-sm font-medium">
-                  <Home size={14}/> Homes
+                  <Home size={14} /> Homes
                 </div>
                 <span className="font-bold text-on-surface text-sm">{counts.homes}</span>
               </div>
-              <input type="range" min="0" max="300" value={counts.homes} onChange={(e) => handleSlider('homes', e.target.value)} 
-                className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#a855f7' }}/>
+              <input type="range" min="0" max="300" value={counts.homes} onChange={(e) => handleSlider('homes', e.target.value)}
+              className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#a855f7' }} />
               <div className="mt-3 text-[11px] text-outline">{peaks.homes} kW peak</div>
             </div>
 
@@ -152,12 +152,12 @@ export default function DemandPage() {
             <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-red-400 text-sm font-medium">
-                  <HeartPulse size={14}/> Clinic
+                  <HeartPulse size={14} /> Clinic
                 </div>
                 <span className="font-bold text-on-surface text-sm">{counts.clinic}</span>
               </div>
-              <input type="range" min="0" max="5" value={counts.clinic} onChange={(e) => handleSlider('clinic', e.target.value)} 
-                className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#ef4444' }}/>
+              <input type="range" min="0" max="5" value={counts.clinic} onChange={(e) => handleSlider('clinic', e.target.value)}
+              className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#ef4444' }} />
               <div className="mt-3 text-[11px] text-red-500/80 font-bold">{peaks.clinic} kW (CRITICAL)</div>
             </div>
 
@@ -165,12 +165,12 @@ export default function DemandPage() {
             <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-blue-400 text-sm font-medium">
-                  <Droplet size={14}/> Pumps
+                  <Droplet size={14} /> Pumps
                 </div>
                 <span className="font-bold text-on-surface text-sm">{counts.pumps}</span>
               </div>
-              <input type="range" min="0" max="20" value={counts.pumps} onChange={(e) => handleSlider('pumps', e.target.value)} 
-                className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#3b82f6' }}/>
+              <input type="range" min="0" max="20" value={counts.pumps} onChange={(e) => handleSlider('pumps', e.target.value)}
+              className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#3b82f6' }} />
               <div className="mt-3 text-[11px] text-blue-400/80">{peaks.pumps} kW (Flexible)</div>
             </div>
 
@@ -178,12 +178,12 @@ export default function DemandPage() {
             <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-yellow-400 text-sm font-medium">
-                  <Store size={14}/> Shops
+                  <Store size={14} /> Shops
                 </div>
                 <span className="font-bold text-on-surface text-sm">{counts.shops}</span>
               </div>
-              <input type="range" min="0" max="50" value={counts.shops} onChange={(e) => handleSlider('shops', e.target.value)} 
-                className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#eab308' }}/>
+              <input type="range" min="0" max="50" value={counts.shops} onChange={(e) => handleSlider('shops', e.target.value)}
+              className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#eab308' }} />
               <div className="mt-3 text-[11px] text-outline">{peaks.shops} kW</div>
             </div>
 
@@ -191,12 +191,12 @@ export default function DemandPage() {
             <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-emerald-400 text-sm font-medium">
-                  <GraduationCap size={14}/> Schools
+                  <GraduationCap size={14} /> Schools
                 </div>
                 <span className="font-bold text-on-surface text-sm">{counts.schools}</span>
               </div>
-              <input type="range" min="0" max="10" value={counts.schools} onChange={(e) => handleSlider('schools', e.target.value)} 
-                className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#10b981' }}/>
+              <input type="range" min="0" max="10" value={counts.schools} onChange={(e) => handleSlider('schools', e.target.value)}
+              className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#10b981' }} />
               <div className="mt-3 text-[11px] text-outline">{peaks.schools} kW</div>
             </div>
 
@@ -204,12 +204,12 @@ export default function DemandPage() {
             <div className="bg-surface-container p-4 rounded-xl border border-outline-variant">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2 text-on-surface-variant text-sm font-medium">
-                  <Lightbulb size={14}/> Lighting
+                  <Lightbulb size={14} /> Lighting
                 </div>
                 <span className="font-bold text-on-surface text-sm">{counts.lighting}</span>
               </div>
-              <input type="range" min="0" max="200" value={counts.lighting} onChange={(e) => handleSlider('lighting', e.target.value)} 
-                className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#94a3b8' }}/>
+              <input type="range" min="0" max="200" value={counts.lighting} onChange={(e) => handleSlider('lighting', e.target.value)}
+              className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer" style={{ accentColor: '#94a3b8' }} />
               <div className="mt-3 text-[11px] text-outline">{peaks.lighting} kW</div>
             </div>
 
@@ -232,21 +232,21 @@ export default function DemandPage() {
                 <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0}/>
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.0} />
                     </linearGradient>
                     <linearGradient id="colorCritical" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.6}/>
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1}/>
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.6} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} opacity={0.5} />
-                  <XAxis dataKey="time" stroke="#64748b" tick={{fontSize: 12}} tickMargin={10} />
-                  <YAxis stroke="#64748b" tick={{fontSize: 12}} tickFormatter={(val) => `${val} kW`} />
-                  <Tooltip 
+                  <XAxis dataKey="time" stroke="#64748b" tick={{ fontSize: 12 }} tickMargin={10} />
+                  <YAxis stroke="#64748b" tick={{ fontSize: 12 }} tickFormatter={(val) => `${val} kW`} />
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }}
-                    itemStyle={{ color: '#0f172a' }}
-                  />
+                    itemStyle={{ color: '#0f172a' }} />
+                  
                   <Area type="monotone" dataKey="total" stroke="#8b5cf6" strokeWidth={3} fill="url(#colorTotal)" name="Total Community Load (kW)" />
                   <Area type="monotone" dataKey="critical" stroke="#ef4444" strokeWidth={2} fill="url(#colorCritical)" name="Critical Protected Load (kW)" />
                 </AreaChart>
@@ -281,11 +281,11 @@ export default function DemandPage() {
                     outerRadius={80}
                     paddingAngle={5}
                     dataKey="value"
-                    stroke="none"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
+                    stroke="none">
+                    
+                    {pieData.map((entry, index) =>
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                    )}
                   </Pie>
                   <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a', borderRadius: '8px' }} />
                 </PieChart>
@@ -293,22 +293,21 @@ export default function DemandPage() {
             </div>
             <div className="mt-4 flex-1">
               <div className="space-y-3">
-                {pieData.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between text-xs">
+                {pieData.map((item, i) =>
+                <div key={i} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }}></div>
                       <span className="text-on-surface-variant">{item.name} <span className="text-outline">({item.count})</span></span>
                     </div>
                     <span className="font-bold text-on-surface">{item.value} kW</span>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </CardContent>
         </Card>
 
       </div>
-    </div>
-  );
-}
+    </div>);
 
+}

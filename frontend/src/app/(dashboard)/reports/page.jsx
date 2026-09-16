@@ -18,11 +18,11 @@ const REPORT_DATA = {
     co2: "105",
     observations: "The automated linear programming dispatch solver maintained zero unserved energy throughout the reporting period. Battery reserve was strictly preserved above the 20% security threshold, safeguarding critical healthcare loads during the evening peak. Diesel generator engagement was successfully delayed until 19:40, resulting in a 43% absolute reduction in fuel burn compared to standard heuristic dispatch logic.",
     table: [
-      { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "684 kWh", cf: "22.4%", avail: "100%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "248 kWh", cf: "31.2%", avail: "98.5%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "BESS Storage", cap: "500 kWh", energy: "342 kWh cycled", cf: "91.8% η", avail: "100%", status: "Healthy", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "152 kWh (Peaking)", cf: "14.1%", avail: "99.1%", status: "Standby", statusColor: "text-amber-500 font-medium" }
-    ]
+    { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "684 kWh", cf: "22.4%", avail: "100%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "248 kWh", cf: "31.2%", avail: "98.5%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "BESS Storage", cap: "500 kWh", energy: "342 kWh cycled", cf: "91.8% η", avail: "100%", status: "Healthy", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "152 kWh (Peaking)", cf: "14.1%", avail: "99.1%", status: "Standby", statusColor: "text-amber-500 font-medium" }]
+
   },
   weekly: {
     id: 'weekly',
@@ -36,11 +36,11 @@ const REPORT_DATA = {
     co2: "740",
     observations: "Weekly solar irradiance was 12% above the seasonal average, allowing the BESS to cycle efficiently and absorb excess daytime generation. Wind patterns remained stable, contributing to a solid 34% capacity factor over the 7-day period. Grid stability was maintained with 100% uptime.",
     table: [
-      { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "4,980 kWh", cf: "24.1%", avail: "99.8%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "1,850 kWh", cf: "34.0%", avail: "97.2%", status: "Maintenance Req", statusColor: "text-amber-500 font-medium" },
-      { asset: "BESS Storage", cap: "500 kWh", energy: "2,410 kWh cycled", cf: "91.5% η", avail: "100%", status: "Healthy", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "1,024 kWh", cf: "12.5%", avail: "99.0%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" }
-    ]
+    { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "4,980 kWh", cf: "24.1%", avail: "99.8%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "1,850 kWh", cf: "34.0%", avail: "97.2%", status: "Maintenance Req", statusColor: "text-amber-500 font-medium" },
+    { asset: "BESS Storage", cap: "500 kWh", energy: "2,410 kWh cycled", cf: "91.5% η", avail: "100%", status: "Healthy", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "1,024 kWh", cf: "12.5%", avail: "99.0%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" }]
+
   },
   monthly: {
     id: 'monthly',
@@ -54,11 +54,11 @@ const REPORT_DATA = {
     co2: "3,200",
     observations: "Financial audit indicates a 15% reduction in Levelized Cost of Energy (LCOE) compared to the baseline projection. Optimization algorithms successfully shifted 85% of non-critical pumping loads to high-solar-yield hours, maximizing free renewable energy and minimizing diesel reliance.",
     table: [
-      { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "21,500 kWh", cf: "23.8%", avail: "99.5%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "7,200 kWh", cf: "30.0%", avail: "95.5%", status: "Repaired", statusColor: "text-emerald-500 print:text-emerald-600" },
-      { asset: "BESS Storage", cap: "500 kWh", energy: "10,200 kWh cycled", cf: "91.2% η", avail: "100%", status: "Healthy", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "4,150 kWh", cf: "15.0%", avail: "98.5%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" }
-    ]
+    { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "21,500 kWh", cf: "23.8%", avail: "99.5%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "7,200 kWh", cf: "30.0%", avail: "95.5%", status: "Repaired", statusColor: "text-emerald-500 print:text-emerald-600" },
+    { asset: "BESS Storage", cap: "500 kWh", energy: "10,200 kWh cycled", cf: "91.2% η", avail: "100%", status: "Healthy", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "4,150 kWh", cf: "15.0%", avail: "98.5%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" }]
+
   },
   annual: {
     id: 'annual',
@@ -72,29 +72,29 @@ const REPORT_DATA = {
     co2: "38,500",
     observations: "Total carbon abated aligns perfectly with corporate ESG sustainability goals. The microgrid has achieved a 91.5% renewable penetration rate YTD. Diesel displacement resulted in the prevention of 38.5 metric tons of CO2 emissions, fully qualifying the site for Tier-1 Carbon Credits under the national registry.",
     table: [
-      { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "265,000 kWh", cf: "24.5%", avail: "99.1%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
-      { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "85,200 kWh", cf: "31.5%", avail: "94.2%", status: "Scheduled Maint", statusColor: "text-amber-500 font-medium" },
-      { asset: "BESS Storage", cap: "500 kWh", energy: "125,000 kWh cycled", cf: "90.8% η", avail: "99.9%", status: "Degradation 2%", statusColor: "text-amber-500 font-medium" },
-      { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "44,000 kWh", cf: "14.2%", avail: "98.0%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" }
-    ]
+    { asset: "Central Solar PV", cap: "250 {powerScale}", energy: "265,000 kWh", cf: "24.5%", avail: "99.1%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" },
+    { asset: "Wind Turbine", cap: "100 {powerScale}", energy: "85,200 kWh", cf: "31.5%", avail: "94.2%", status: "Scheduled Maint", statusColor: "text-amber-500 font-medium" },
+    { asset: "BESS Storage", cap: "500 kWh", energy: "125,000 kWh cycled", cf: "90.8% η", avail: "99.9%", status: "Degradation 2%", statusColor: "text-amber-500 font-medium" },
+    { asset: "Diesel Genset", cap: "150 {powerScale}", energy: "44,000 kWh", cf: "14.2%", avail: "98.0%", status: "Nominal", statusColor: "text-cyan-400 print:text-cyan-600" }]
+
   }
 };
 
-type TabKey = keyof typeof REPORT_DATA;
+
 
 export default function ReportsPage() {
   const { currency, powerScale, formatCurrency, formatPower } = useSettings();
-  const [activeTab, setActiveTab] = useState<TabKey>('daily');
+  const [activeTab, setActiveTab] = useState('daily');
 
   const activeData = REPORT_DATA[activeTab];
 
   const exportCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
     csvContent += "Asset,Capacity,Energy Delivered,Capacity Factor,Availability,Status\n";
-    
-    activeData.table.forEach(row => {
+
+    activeData.table.forEach((row) => {
       // Clean up text if needed and join with commas
-      const rowString = `${row.asset},${row.cap.includes("{powerScale}") ? row.cap.replace(/([\d,.-]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g,'')))) : row.cap},${row.energy},${row.cf},${row.avail},${row.status}`;
+      const rowString = `${row.asset},${row.cap.includes("{powerScale}") ? row.cap.replace(/([\d,.-]+)\s*\{powerScale\}/g, (m, num) => formatPower(parseFloat(num.replace(/,/g, '')))) : row.cap},${row.energy},${row.cf},${row.avail},${row.status}`;
       csvContent += rowString + "\n";
     });
 
@@ -136,19 +136,19 @@ export default function ReportsPage() {
 
       {/* Tabs Menu - Hidden during PDF print */}
       <div className="flex gap-6 border-b border-outline-variant pb-2 print:hidden overflow-x-auto">
-        {(Object.keys(REPORT_DATA) as TabKey[]).map((key) => (
-          <button 
-            key={key}
-            onClick={() => setActiveTab(key)}
-            className={`text-sm font-bold pb-2 whitespace-nowrap transition-colors ${
-              activeTab === key 
-                ? "text-on-surface border-b-2 border-emerald-500" 
-                : "text-outline hover:text-on-surface border-b-2 border-transparent"
-            }`}
-          >
+        {Object.keys(REPORT_DATA).map((key) =>
+        <button
+          key={key}
+          onClick={() => setActiveTab(key)}
+          className={`text-sm font-bold pb-2 whitespace-nowrap transition-colors ${
+          activeTab === key ?
+          "text-on-surface border-b-2 border-emerald-500" :
+          "text-outline hover:text-on-surface border-b-2 border-transparent"}`
+          }>
+          
             {REPORT_DATA[key].label}
           </button>
-        ))}
+        )}
       </div>
 
       {/* Printable Report Document */}
@@ -197,8 +197,8 @@ export default function ReportsPage() {
             </div>
             <div className="bg-surface-container/50 p-5 rounded-xl border border-outline-variant/50 print:bg-slate-50 print:border-slate-200">
               <div className="text-xs font-semibold text-outline uppercase tracking-wider mb-2 print:text-slate-500">Operating Cost</div>
-              <div className="text-3xl font-black text-emerald-500 print:text-emerald-700 mb-1">{formatCurrency(parseFloat(activeData.cost.replace(/[^0-9.-]+/g,"")))}</div>
-              <div className="text-xs text-emerald-500 font-bold">Saved {formatCurrency(parseFloat(activeData.saved.replace(/[^0-9.-]+/g,"")))}</div>
+              <div className="text-3xl font-black text-emerald-500 print:text-emerald-700 mb-1">{formatCurrency(parseFloat(activeData.cost.replace(/[^0-9.-]+/g, "")))}</div>
+              <div className="text-xs text-emerald-500 font-bold">Saved {formatCurrency(parseFloat(activeData.saved.replace(/[^0-9.-]+/g, "")))}</div>
             </div>
             <div className="bg-surface-container/50 p-5 rounded-xl border border-outline-variant/50 print:bg-slate-50 print:border-slate-200">
               <div className="text-xs font-semibold text-outline uppercase tracking-wider mb-2 print:text-slate-500">Diesel Displaced</div>
@@ -228,8 +228,8 @@ export default function ReportsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-outline-variant/50 print:divide-slate-200 bg-background/50 print:bg-white text-on-surface-variant print:text-slate-700">
-                  {activeData.table.map((row, idx) => (
-                    <tr key={idx} className="hover:bg-surface-container/30 transition-colors print:hover:bg-white">
+                  {activeData.table.map((row, idx) =>
+                  <tr key={idx} className="hover:bg-surface-container/30 transition-colors print:hover:bg-white">
                       <td className="px-6 py-4 font-bold text-on-surface print:text-black">{row.asset}</td>
                       <td className="px-6 py-4">{row.cap.replace('{powerScale}', powerScale)}</td>
                       <td className="px-6 py-4 text-on-surface print:text-slate-900 font-mono">{row.energy}</td>
@@ -237,7 +237,7 @@ export default function ReportsPage() {
                       <td className="px-6 py-4 text-emerald-500 print:text-emerald-700 font-bold">{row.avail}</td>
                       <td className={`px-6 py-4 text-right font-bold ${row.statusColor.replace('print:text-cyan-600', 'print:text-cyan-800').replace('print:text-emerald-600', 'print:text-emerald-800')}`}>{row.status}</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -268,7 +268,6 @@ export default function ReportsPage() {
 
         </div>
       </div>
-    </div>
-  );
-}
+    </div>);
 
+}

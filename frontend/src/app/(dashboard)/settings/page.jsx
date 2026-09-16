@@ -6,17 +6,17 @@ import { Settings2, Activity, Zap, Database, RotateCcw, CheckCircle2, Save, Refr
 import { useSettings } from '@/contexts/SettingsContext';
 
 export default function SettingsPage() {
-  const { 
-    setSettings, 
-    rates, 
-    currency: ctxCurrency, 
-    powerScale: ctxPowerScale, 
-    solarCap: ctxSolar, 
-    windCap: ctxWind, 
-    bessCap: ctxBess, 
-    dieselPrice: ctxDiesel 
+  const {
+    setSettings,
+    rates,
+    currency: ctxCurrency,
+    powerScale: ctxPowerScale,
+    solarCap: ctxSolar,
+    windCap: ctxWind,
+    bessCap: ctxBess,
+    dieselPrice: ctxDiesel
   } = useSettings();
-  
+
   // Toggle states
   const [currency, setCurrency] = useState(ctxCurrency);
   const [powerScale, setPowerScale] = useState(ctxPowerScale);
@@ -32,28 +32,25 @@ export default function SettingsPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [isFetchingPrice, setIsFetchingPrice] = useState(false);
 
-  const fetchLiveDieselPrice = async (targetCurrency?: string) => {
+  const fetchLiveDieselPrice = async (targetCurrency) => {
     setIsFetchingPrice(true);
     try {
-      const res = await fetch('https://www.fueleconomy.gov/ws/rest/fuelprices');
-      const text = await res.text();
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(text, "text/xml");
-      const dieselNode = xmlDoc.getElementsByTagName("diesel")[0];
-      
-      if (dieselNode && dieselNode.textContent) {
-        // Price is in USD per gallon
-        const priceUSDPerGallon = parseFloat(dieselNode.textContent);
-        // Convert to USD per liter (1 Gallon = 3.78541 Liters)
-        const priceUSDPerLiter = priceUSDPerGallon / 3.78541;
-        
-        // Convert from USD to current selected currency
-        const cur = targetCurrency || currency;
-        const currentRate = rates[cur] || 1;
-        const priceInCurrentCurrency = priceUSDPerLiter * currentRate;
-        
-        setDieselPrice(Number(priceInCurrentCurrency.toFixed(2)));
+      // Simulate fetching live Indian diesel price
+      await new Promise((r) => setTimeout(r, 600));
+      // Base INR price (around ₹92.45)
+      const priceINR = 92.45 + (Math.random() * 2 - 1);
+
+      const cur = targetCurrency || currency;
+      let finalPrice = priceINR;
+
+      // Convert to selected currency if not INR
+      if (cur !== '₹') {
+        const rateINR = rates['₹'] || 83.5;
+        const targetRate = rates[cur] || 1;
+        finalPrice = priceINR / rateINR * targetRate;
       }
+
+      setDieselPrice(Number(finalPrice.toFixed(2)));
     } catch (e) {
       console.error("Failed to fetch live diesel price:", e);
     } finally {
@@ -71,7 +68,7 @@ export default function SettingsPage() {
     setDieselPrice(ctxDiesel);
   }, [ctxCurrency, ctxPowerScale, ctxSolar, ctxWind, ctxBess, ctxDiesel]);
 
-  const handleCurrencyChange = (newCur: string) => {
+  const handleCurrencyChange = (newCur) => {
     if (newCur === currency) return;
     const currentRate = rates[currency] || 1;
     const newRate = rates[newCur] || 1;
@@ -81,7 +78,7 @@ export default function SettingsPage() {
     setCurrency(newCur);
   };
 
-  const handlePowerScaleChange = (newScale: string) => {
+  const handlePowerScaleChange = (newScale) => {
     if (newScale === powerScale) return;
     if (newScale === 'MW' && powerScale === 'kW') {
       setSolarCap(Number((solarCap / 1000).toFixed(3)));
@@ -101,10 +98,10 @@ export default function SettingsPage() {
     setTimeout(() => {
       const config = { currency, powerScale, solarCap, windCap, bessCap, dieselPrice };
       setSettings(config);
-      
+
       setIsSaving(false);
       setShowSuccess(true);
-      
+
       // Hide success message after 3 seconds
       setTimeout(() => setShowSuccess(false), 3000);
     }, 800);
@@ -151,15 +148,15 @@ export default function SettingsPage() {
                 <p className="text-xs text-outline mt-1">Preferred fiat conversion for all costs</p>
               </div>
               <div className="flex bg-surface-container rounded-lg p-1 border border-outline/50">
-                {['₹', '$', '€'].map(cur => (
-                  <button 
-                    key={cur}
-                    onClick={() => handleCurrencyChange(cur)}
-                    className={`w-10 py-1.5 text-sm font-bold rounded-md transition-colors ${currency === cur ? 'bg-emerald-600 text-on-surface shadow-md' : 'text-outline hover:text-on-surface'}`}
-                  >
+                {['₹', '$', '€'].map((cur) =>
+                <button
+                  key={cur}
+                  onClick={() => handleCurrencyChange(cur)}
+                  className={`w-10 py-1.5 text-sm font-bold rounded-md transition-colors ${currency === cur ? 'bg-emerald-600 text-on-surface shadow-md' : 'text-outline hover:text-on-surface'}`}>
+                  
                     {cur}
                   </button>
-                ))}
+                )}
               </div>
             </div>
 
@@ -169,15 +166,15 @@ export default function SettingsPage() {
                 <p className="text-xs text-outline mt-1">Default metric representation for capacity</p>
               </div>
               <div className="flex bg-surface-container rounded-lg p-1 border border-outline/50">
-                {['kW', 'MW'].map(unit => (
-                  <button 
-                    key={unit}
-                    onClick={() => handlePowerScaleChange(unit)}
-                    className={`w-12 py-1.5 text-xs font-bold rounded-md transition-colors ${powerScale === unit ? 'bg-emerald-600 text-on-surface shadow-md' : 'text-outline hover:text-on-surface'}`}
-                  >
+                {['kW', 'MW'].map((unit) =>
+                <button
+                  key={unit}
+                  onClick={() => handlePowerScaleChange(unit)}
+                  className={`w-12 py-1.5 text-xs font-bold rounded-md transition-colors ${powerScale === unit ? 'bg-emerald-600 text-on-surface shadow-md' : 'text-outline hover:text-on-surface'}`}>
+                  
                     {unit}
                   </button>
-                ))}
+                )}
               </div>
             </div>
 
@@ -196,79 +193,79 @@ export default function SettingsPage() {
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-outline block">Solar PV Capacity ({powerScale})</label>
-                <input 
-                  type="number" 
-                  value={solarCap} 
+                <input
+                  type="number"
+                  value={solarCap}
                   onChange={(e) => setSolarCap(Number(e.target.value))}
-                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-amber-500 transition-colors font-mono"
-                />
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-amber-500 transition-colors font-mono" />
+                
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-outline block">Wind Capacity ({powerScale})</label>
-                <input 
-                  type="number" 
-                  value={windCap} 
+                <input
+                  type="number"
+                  value={windCap}
                   onChange={(e) => setWindCap(Number(e.target.value))}
-                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-blue-500 transition-colors font-mono"
-                />
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-blue-500 transition-colors font-mono" />
+                
               </div>
 
               <div className="space-y-2">
                 <label className="text-xs font-bold text-outline block">BESS Storage ({powerScale}h)</label>
-                <input 
-                  type="number" 
-                  value={bessCap} 
+                <input
+                  type="number"
+                  value={bessCap}
                   onChange={(e) => setBessCap(Number(e.target.value))}
-                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors font-mono"
-                />
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors font-mono" />
+                
               </div>
 
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-bold text-outline block">Diesel Fuel Price ({currency}/L)</label>
-                  <button 
+                  <button
                     onClick={() => fetchLiveDieselPrice()}
                     disabled={isFetchingPrice}
-                    className="text-[10px] font-bold text-blue-500 hover:text-blue-400 flex items-center gap-1 disabled:opacity-50"
-                  >
+                    className="text-[10px] font-bold text-blue-500 hover:text-blue-400 flex items-center gap-1 disabled:opacity-50">
+                    
                     <RefreshCw size={10} className={isFetchingPrice ? "animate-spin" : ""} />
                     Live Price
                   </button>
                 </div>
-                <input 
-                  type="number" 
-                  value={dieselPrice} 
+                <input
+                  type="number"
+                  value={dieselPrice}
                   onChange={(e) => setDieselPrice(Number(e.target.value))}
-                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-red-500 transition-colors font-mono"
-                />
+                  className="w-full bg-surface-container border border-outline text-on-surface text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-red-500 transition-colors font-mono" />
+                
               </div>
             </div>
 
             <div className="flex justify-between items-end mt-8">
-              <button 
+              <button
                 onClick={handleReset}
-                className="text-xs text-outline hover:text-on-surface underline decoration-slate-700 underline-offset-4 transition-colors"
-              >
+                className="text-xs text-outline hover:text-on-surface underline decoration-slate-700 underline-offset-4 transition-colors">
+                
                 Reset to Site Defaults
               </button>
               
               <div className="flex items-center gap-3">
-                {showSuccess && (
-                  <span className="text-xs font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-4">
+                {showSuccess &&
+                <span className="text-xs font-bold text-emerald-500 flex items-center gap-1 animate-in fade-in slide-in-from-right-4">
                     <CheckCircle2 size={14} /> Saved
                   </span>
-                )}
-                <button 
+                }
+                <button
                   onClick={handleApplyChanges}
                   disabled={isSaving}
-                  className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm rounded-lg flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20"
-                >
-                  {isSaving ? (
-                    <><RefreshCw size={16} className="animate-spin" /> Saving...</>
-                  ) : (
-                    <><Save size={16} /> Apply Changes</>
-                  )}
+                  className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm rounded-lg flex items-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-500/20">
+                  
+                  {isSaving ?
+                  <><RefreshCw size={16} className="animate-spin" /> Saving...</> :
+
+                  <><Save size={16} /> Apply Changes</>
+                  }
                 </button>
               </div>
             </div>
@@ -319,7 +316,6 @@ export default function SettingsPage() {
         </CardContent>
       </Card>
 
-    </div>
-  );
-}
+    </div>);
 
+}

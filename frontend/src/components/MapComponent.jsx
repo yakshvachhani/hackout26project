@@ -11,7 +11,7 @@ const customIcon = new L.Icon({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
   iconSize: [25, 41],
-  iconAnchor: [12, 41],
+  iconAnchor: [12, 41]
 });
 
 
@@ -115,20 +115,20 @@ const customIcon = new L.Icon({
 
 
 export default function MapComponent() {
-  const center: [number, number] = [23.7337, 69.8597]; // Kutch coordinates
+  const center = [23.7337, 69.8597]; // Kutch coordinates
 
   return (
     <div className="h-[600px] w-full z-0 relative">
-      <MapContainer 
-        center={center} 
-        zoom={14} 
-        scrollWheelZoom={false} 
-        style={{ height: '100%', width: '100%' }}
-      >
+      <MapContainer
+        center={center}
+        zoom={14}
+        scrollWheelZoom={false}
+        style={{ height: '100%', width: '100%' }}>
+        
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        />
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
+        
         
         {/* Assets */}
         <Marker position={[23.7337, 69.8597]} icon={customIcon}>
@@ -156,6 +156,6 @@ export default function MapComponent() {
         <Circle center={center} pathOptions={{ fillColor: '#10b981', color: '#10b981' }} radius={800} opacity={0.2} />
         
       </MapContainer>
-    </div>
-  );
+    </div>);
+
 }

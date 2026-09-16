@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-09-16T12:28:23.321885+00:00",
+  "timestamp": "2026-09-16T16:17:09.328837+00:00",
   "source": "LIVE",
   "provider": "Open-Meteo",
-  "condition": "Partly Cloudy",
-  "temperature_c": 29.4,
-  "solar_irradiance_wm2": 131.7,
-  "wind_speed_ms": 6.8,
-  "cloud_cover_pct": 67.0,
+  "condition": "Mainly Clear",
+  "temperature_c": 27.5,
+  "solar_irradiance_wm2": 0.0,
+  "wind_speed_ms": 7.2,
+  "cloud_cover_pct": 35.0,
   "advisory": null,
   "latitude": 23.0225,
   "longitude": 72.5714

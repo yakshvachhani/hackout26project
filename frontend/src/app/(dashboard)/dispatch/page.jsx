@@ -3,15 +3,15 @@
 import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
+import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  LineChart, Line, ComposedChart, Bar, Legend
-} from 'recharts';
+  LineChart, Line, ComposedChart, Bar, Legend } from
+'recharts';
 import { Activity, Sun, Wind, Battery, Droplet, Zap, ShieldAlert } from 'lucide-react';
 
 export default function DispatchPage() {
   const { currency, powerScale, formatPower, mode, simScenario } = useSettings();
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState([]);
   const [liveData, setLiveData] = useState({
     solar: 1800,
     wind: 31800,
@@ -27,28 +27,28 @@ export default function DispatchPage() {
     // Generate initial 24h data based on mode and scenario
     const initial = [];
     const now = new Date();
-    for(let i = 24; i >= 0; i--) {
+    for (let i = 24; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 60 * 60 * 1000);
       const hour = d.getHours();
-      
+
       let solarPeak = 180;
       if (mode === 'SIMULATION' && simScenario === 'solar_drop') {
         solarPeak = 55; // attenuated
       }
-      let s = (hour > 6 && hour < 19) ? Math.sin((hour - 6) / 13 * Math.PI) * solarPeak : 0;
+      let s = hour > 6 && hour < 19 ? Math.sin((hour - 6) / 13 * Math.PI) * solarPeak : 0;
       let baseLoad = 80;
       if (mode === 'SIMULATION' && simScenario === 'demand_spike') {
         baseLoad = 115; // surge
       }
       const morningPeak = hour >= 7 && hour <= 10 ? 40 : 0;
-      const eveningPeak = hour >= 18 && hour <= 22 ? (mode === 'SIMULATION' && simScenario === 'demand_spike' ? 85 : 60) : 0;
+      const eveningPeak = hour >= 18 && hour <= 22 ? mode === 'SIMULATION' && simScenario === 'demand_spike' ? 85 : 60 : 0;
       const demand = baseLoad + morningPeak + eveningPeak + Math.random() * 10;
       const w = 20 + Math.random() * 30;
-      
+
       let batteryDischarge = 0;
       let batteryCharge = 0;
       let diesel = 0;
-      
+
       const gen = s + w;
       if (gen > demand) {
         batteryCharge = Math.min(gen - demand, 50); // cap charging
@@ -74,7 +74,7 @@ export default function DispatchPage() {
         batteryCharge: -batteryCharge * 1000,
         diesel: diesel * 1000,
         demand: demand * 1000,
-        reserveMargin: Math.max(0, (250 + 100 + 500) * 1000 - (demand * 1000)),
+        reserveMargin: Math.max(0, (250 + 100 + 500) * 1000 - demand * 1000),
         availableSolar: (s + 20) * 1000,
         curtailedEnergy: batteryCharge === 50 ? (gen - demand - 50) * 1000 : 0,
         curtailmentRate: batteryCharge === 50 ? 5 : 0
@@ -83,7 +83,7 @@ export default function DispatchPage() {
     setData(initial);
 
     const interval = setInterval(() => {
-      setLiveData(prev => {
+      setLiveData((prev) => {
         const newWind = Math.max(0, prev.wind + (Math.random() * 1000 - 500));
         const newDemand = Math.max(50000, prev.demand + (Math.random() * 2000 - 1000));
         return {
@@ -93,10 +93,10 @@ export default function DispatchPage() {
         };
       });
 
-      setData(current => {
+      setData((current) => {
         const newArr = [...current];
         const last = { ...newArr[newArr.length - 1] };
-        
+
         last.wind = liveData.wind;
         last.demand = liveData.demand;
         // recalculate balances
@@ -116,7 +116,7 @@ export default function DispatchPage() {
             last.diesel = deficit > 60000 ? deficit - 60000 : 0;
           }
         }
-        
+
         newArr[newArr.length - 1] = last;
         return newArr;
       });
@@ -134,29 +134,29 @@ export default function DispatchPage() {
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-on-surface flex items-center gap-3">
             Live Dispatch & Power Balance
-            {mode === 'SIMULATION' ? (
-              <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 uppercase tracking-wider flex items-center gap-1 animate-pulse">
+            {mode === 'SIMULATION' ?
+            <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded border border-amber-500/30 uppercase tracking-wider flex items-center gap-1 animate-pulse">
                 <ShieldAlert size={10} /> SCADA: SIMULATION INJECTION ({simScenario.toUpperCase()})
-              </span>
-            ) : (
-              <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
+              </span> :
+
+            <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30 uppercase tracking-wider flex items-center gap-1">
                 <Activity size={10} /> SCADA: SYNC
               </span>
-            )}
+            }
           </h2>
           <p className="text-outline text-sm mt-1">Real-time multi-interval generation matching, spinning reserve verification, and curtailment tracking</p>
         </div>
         
         <div className="flex bg-surface rounded-md border border-outline p-1">
-          {[1, 6, 12, 24].map(hours => (
-            <button 
-              key={hours}
-              onClick={() => setTimeRange(hours)}
-              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${timeRange === hours ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-outline hover:text-on-surface border border-transparent'}`}
-            >
+          {[1, 6, 12, 24].map((hours) =>
+          <button
+            key={hours}
+            onClick={() => setTimeRange(hours)}
+            className={`px-3 py-1 text-xs font-medium rounded transition-colors ${timeRange === hours ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-outline hover:text-on-surface border border-transparent'}`}>
+            
               {hours}h
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -170,32 +170,32 @@ export default function DispatchPage() {
         </CardHeader>
         <CardContent className="pt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <div className="space-y-1">
-            <div className="text-[10px] font-bold text-yellow-500 uppercase flex items-center gap-1"><Sun size={10}/> Solar Array</div>
+            <div className="text-[10px] font-bold text-yellow-500 uppercase flex items-center gap-1"><Sun size={10} /> Solar Array</div>
             <div className="text-xl font-bold text-on-surface">{formatPower(liveData.solar)}</div>
             <div className="text-[10px] text-outline">Cap: {formatPower(250000)}</div>
           </div>
           <div className="space-y-1 border-l border-outline-variant pl-4">
-            <div className="text-[10px] font-bold text-blue-500 uppercase flex items-center gap-1"><Wind size={10}/> Wind Turbine</div>
+            <div className="text-[10px] font-bold text-blue-500 uppercase flex items-center gap-1"><Wind size={10} /> Wind Turbine</div>
             <div className="text-xl font-bold text-on-surface">{formatPower(liveData.wind)}</div>
             <div className="text-[10px] text-outline">Cap: {formatPower(100000)}</div>
           </div>
           <div className="space-y-1 border-l border-outline-variant pl-4">
-            <div className="text-[10px] font-bold text-indigo-400 uppercase flex items-center gap-1"><Battery size={10}/> BESS Power</div>
+            <div className="text-[10px] font-bold text-indigo-400 uppercase flex items-center gap-1"><Battery size={10} /> BESS Power</div>
             <div className="text-xl font-bold text-emerald-400">+{formatPower(liveData.battery)}</div>
             <div className="text-[10px] text-outline">Discharging</div>
           </div>
           <div className="space-y-1 border-l border-outline-variant pl-4">
-            <div className="text-[10px] font-bold text-red-500 uppercase flex items-center gap-1"><Droplet size={10}/> Diesel Genset</div>
+            <div className="text-[10px] font-bold text-red-500 uppercase flex items-center gap-1"><Droplet size={10} /> Diesel Genset</div>
             <div className="text-xl font-bold text-on-surface">{formatPower(liveData.diesel)}</div>
             <div className="text-[10px] text-outline">Cap: {formatPower(750000)}</div>
           </div>
           <div className="space-y-1 border-l border-outline-variant pl-4">
-            <div className="text-[10px] font-bold text-purple-400 uppercase flex items-center gap-1"><Zap size={10}/> Total Demand</div>
+            <div className="text-[10px] font-bold text-purple-400 uppercase flex items-center gap-1"><Zap size={10} /> Total Demand</div>
             <div className="text-xl font-bold text-on-surface">{formatPower(liveData.demand)}</div>
             <div className="text-[10px] text-emerald-500">Deficit: 0 {powerScale}</div>
           </div>
           <div className="space-y-1 border-l border-outline-variant pl-4">
-            <div className="text-[10px] font-bold text-emerald-500 uppercase flex items-center gap-1"><ShieldAlert size={10}/> Spinning Reserve</div>
+            <div className="text-[10px] font-bold text-emerald-500 uppercase flex items-center gap-1"><ShieldAlert size={10} /> Spinning Reserve</div>
             <div className="text-xl font-bold text-emerald-400">{formatPower(liveData.reserve)}</div>
             <div className="text-[10px] text-outline">N-1 Compliant</div>
           </div>
@@ -217,29 +217,29 @@ export default function DispatchPage() {
               <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorSolar" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#d97706" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#d97706" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#d97706" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#d97706" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="colorWind" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0891b2" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#0891b2" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#0891b2" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#0891b2" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="colorBatt" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="colorDiesel" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#be123c" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#be123c" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#be123c" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#be123c" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                 <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)} kW`} />
-                <RechartsTooltip 
+                <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val / 1000).toFixed(0)} kW`} />
+                <RechartsTooltip
                   contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px' }}
-                  itemStyle={{ fontWeight: 'bold' }}
-                />
+                  itemStyle={{ fontWeight: 'bold' }} />
+                
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                 
                 <Area type="monotone" dataKey="batteryDischarge" stackId="1" stroke="#4f46e5" fill="url(#colorBatt)" name="Battery Discharge" />
@@ -272,7 +272,7 @@ export default function DispatchPage() {
                 <LineChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)} kW`} />
+                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val / 1000).toFixed(0)} kW`} />
                   <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend iconType="plainline" wrapperStyle={{ fontSize: '11px' }} />
                   <Line type="monotone" dataKey="demand" stroke="#8b5cf6" strokeWidth={2} dot={false} name="Demand" />
@@ -300,7 +300,7 @@ export default function DispatchPage() {
                 <ComposedChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)} kW`} />
+                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val / 1000).toFixed(0)} kW`} />
                   <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend wrapperStyle={{ fontSize: '11px' }} />
                   <Bar dataKey="availableSolar" fill="#ca8a04" barSize={10} name="Available Solar" />
@@ -320,8 +320,8 @@ export default function DispatchPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-             {displayData.filter((_, i) => i % Math.max(1, Math.floor(timeRange / 6)) === 0).map((row, i) => (
-               <div key={i} className="flex items-center gap-4 border-b border-outline-variant pb-2 last:border-0">
+             {displayData.filter((_, i) => i % Math.max(1, Math.floor(timeRange / 6)) === 0).map((row, i) =>
+            <div key={i} className="flex items-center gap-4 border-b border-outline-variant pb-2 last:border-0">
                  <div className="text-sm font-mono text-outline w-16">{row.time}</div>
                  <div className="flex-1 flex gap-2">
                    {row.solar > 0 && <span className="px-2 py-1 bg-yellow-500/20 text-yellow-500 text-xs rounded border border-yellow-500/30">Solar</span>}
@@ -331,11 +331,10 @@ export default function DispatchPage() {
                  </div>
                  <div className="text-sm text-emerald-400 font-mono">{formatPower(row.demand)}</div>
                </div>
-             ))}
+            )}
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
-}
+    </div>);
 
+}

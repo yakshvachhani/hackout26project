@@ -3,15 +3,15 @@
 import { useSettings } from '@/contexts/SettingsContext';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
+import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
-  LineChart, Line, ComposedChart, Bar, Legend
-} from 'recharts';
+  LineChart, Line, ComposedChart, Bar, Legend } from
+'recharts';
 import { Calendar, CloudSun, Sun, Wind, Activity, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export default function ForecastPage() {
   const { currency, powerScale, formatPower } = useSettings();
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState([]);
   const [horizon, setHorizon] = useState(48); // 24 or 48
 
   useEffect(() => {
@@ -20,14 +20,14 @@ export default function ForecastPage() {
         // Dhordo, Gujarat
         const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=23.83&longitude=69.85&hourly=wind_speed_10m,direct_normal_irradiance,shortwave_radiation&timezone=auto&forecast_days=3');
         const json = await res.json();
-        
+
         const now = new Date();
         // find current hour index
-        const currentHourStr = now.toISOString().slice(0, 14) + "00"; 
+        const currentHourStr = now.toISOString().slice(0, 14) + "00";
         // open meteo time format is "YYYY-MM-DDTHH:00"
-        
+
         const hourly = json.hourly;
-        let startIndex = hourly.time.findIndex((t: string) => new Date(t).getHours() === now.getHours() && new Date(t).getDate() === now.getDate());
+        let startIndex = hourly.time.findIndex((t) => new Date(t).getHours() === now.getHours() && new Date(t).getDate() === now.getDate());
         if (startIndex === -1) startIndex = 0;
 
         const processedData = [];
@@ -42,13 +42,13 @@ export default function ForecastPage() {
           const dni = hourly.direct_normal_irradiance[idx] || 0;
           const ghi = hourly.shortwave_radiation[idx] || 0;
           const windSpeed = hourly.wind_speed_10m[idx] || 0; // km/h
-          
+
           // Convert wind speed from km/h to m/s
           const windSpeedMs = windSpeed / 3.6;
 
           // Physics-grounded solar model: Cap 250 kW, roughly based on GHI
           // Standard test condition is 1000 W/m2 for full capacity.
-          const expectedSolar = Math.min(250000, (ghi / 1000) * 250000 * 0.85);
+          const expectedSolar = Math.min(250000, ghi / 1000 * 250000 * 0.85);
 
           // Anemometer wind curve: Cap 100 kW
           // cut-in 3 m/s, rated 10 m/s
@@ -64,7 +64,7 @@ export default function ForecastPage() {
           const baseLoad = 80000;
           const morningPeak = h >= 7 && h <= 10 ? 40000 : 0;
           const eveningPeak = h >= 18 && h <= 22 ? 70000 : 0;
-          const demand = baseLoad + morningPeak + eveningPeak + (Math.random() * 5000);
+          const demand = baseLoad + morningPeak + eveningPeak + Math.random() * 5000;
 
           processedData.push({
             time: timeLabel,
@@ -92,7 +92,7 @@ export default function ForecastPage() {
 
   // Get operational blocks based on horizon (24h: 0, 4, 8, 12, 18, 24; 48h: 0, 6, 12, 24, 36, 48)
   const offsets = horizon === 24 ? [0, 4, 8, 12, 18, 24] : [0, 6, 12, 24, 36, 48];
-  const opBlocks = offsets.map(offset => data[offset]).filter(Boolean);
+  const opBlocks = offsets.map((offset) => data[offset]).filter(Boolean);
 
   return (
     <div className="space-y-6 pb-12">
@@ -109,16 +109,16 @@ export default function ForecastPage() {
         </div>
         
         <div className="flex bg-surface rounded-md border border-outline p-1">
-          <button 
+          <button
             onClick={() => setHorizon(24)}
-            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 24 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-outline hover:text-on-surface'}`}
-          >
+            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 24 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'text-outline hover:text-on-surface'}`}>
+            
             24h Horizon
           </button>
-          <button 
+          <button
             onClick={() => setHorizon(48)}
-            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 48 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'text-outline hover:text-on-surface'}`}
-          >
+            className={`px-4 py-1.5 text-xs font-medium rounded transition-colors ${horizon === 48 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'text-outline hover:text-on-surface'}`}>
+            
             48h Horizon
           </button>
         </div>
@@ -139,7 +139,7 @@ export default function ForecastPage() {
             let statusText = "Normal Surplus";
             let StatusIcon = CheckCircle2;
             let statusColor = "text-emerald-500";
-            
+
             if (deficit > 50000) {
               statusText = "Evening Peak: BESS Active";
               StatusIcon = AlertTriangle;
@@ -173,8 +173,8 @@ export default function ForecastPage() {
                 <div className={`mt-3 text-[10px] flex items-center gap-1 ${statusColor}`}>
                   <StatusIcon size={12} /> {statusText}
                 </div>
-              </div>
-            );
+              </div>);
+
           })}
         </CardContent>
       </Card>
@@ -199,8 +199,8 @@ export default function ForecastPage() {
                 <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorGHI" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
@@ -234,7 +234,7 @@ export default function ForecastPage() {
                 <AreaChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} interval={5} />
-                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)}`} />
+                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val / 1000).toFixed(0)}`} />
                   <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend iconType="plainline" wrapperStyle={{ fontSize: '11px' }} />
                   <Area type="monotone" dataKey="solar" stroke="#eab308" strokeWidth={2} fill="#eab308" fillOpacity={0.1} name="Expected Solar" />
@@ -264,7 +264,7 @@ export default function ForecastPage() {
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} interval={5} />
                   
                   {/* Left Y Axis for Generation (kW) */}
-                  <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)}`} />
+                  <YAxis yAxisId="left" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val / 1000).toFixed(0)}`} />
                   
                   {/* Right Y Axis for Speed (m/s) */}
                   <YAxis yAxisId="right" orientation="right" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${val} m/s`} />
@@ -298,7 +298,7 @@ export default function ForecastPage() {
                 <ComposedChart data={displayData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
                   <XAxis dataKey="time" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} interval={5} />
-                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val/1000).toFixed(0)}`} />
+                  <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(val) => `${(val / 1000).toFixed(0)}`} />
                   <RechartsTooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', fontSize: '11px' }} />
                   <Legend iconType="plainline" wrapperStyle={{ fontSize: '11px' }} />
                   
@@ -311,7 +311,6 @@ export default function ForecastPage() {
         </Card>
 
       </div>
-    </div>
-  );
-}
+    </div>);
 
+}

@@ -11,7 +11,6 @@ export default function MapPage() {
         <h2 className="text-2xl font-bold mb-2">Map Feature Disabled</h2>
         <p>The Google Maps API integration has been removed from this project.</p>
       </div>
-    </div>
-  );
-}
+    </div>);
 
+}

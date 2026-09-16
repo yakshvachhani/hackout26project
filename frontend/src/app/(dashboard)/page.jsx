@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 // Flow Diagram Component with SVG lines
-function EnergyFlowDiagram({ data, formatPower, mode, simScenario }: { data: any, formatPower: any, mode?: string, simScenario?: string }) {
+function EnergyFlowDiagram({ data, formatPower, mode, simScenario }) {
   if (!data) return <div className="h-64 flex items-center justify-center text-outline">Loading flow...</div>;
 
   const solar = data.solar || 0;
@@ -18,17 +18,17 @@ function EnergyFlowDiagram({ data, formatPower, mode, simScenario }: { data: any
   const battery = data.battery || 0;
   const diesel = data.diesel || 0;
   const load = data.load || 0;
-  
+
   return (
     <div className="relative h-[500px] w-full rounded-xl bg-surface border border-outline-variant overflow-hidden flex flex-col items-center justify-center p-8">
       {/* SVG Connecting Lines */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
         {/* Solar to Bus */}
-        <line x1="50%" y1="20%" x2="50%" y2="50%" stroke={solar > 0 ? (mode === 'SIMULATION' && simScenario === 'solar_drop' ? "#f59e0b" : "#10b981") : "#334155"} strokeWidth="2" strokeDasharray={solar > 0 ? "5,5" : ""} className={solar > 0 ? "animate-[dash_1s_linear_infinite]" : ""} />
+        <line x1="50%" y1="20%" x2="50%" y2="50%" stroke={solar > 0 ? mode === 'SIMULATION' && simScenario === 'solar_drop' ? "#f59e0b" : "#10b981" : "#334155"} strokeWidth="2" strokeDasharray={solar > 0 ? "5,5" : ""} className={solar > 0 ? "animate-[dash_1s_linear_infinite]" : ""} />
         {/* Wind to Bus */}
         <line x1="30%" y1="50%" x2="50%" y2="50%" stroke={wind > 0 ? "#10b981" : "#334155"} strokeWidth="2" strokeDasharray={wind > 0 ? "5,5" : ""} className={wind > 0 ? "animate-[dash_1s_linear_infinite]" : ""} />
         {/* Battery to Bus */}
-        <line x1="70%" y1="50%" x2="50%" y2="50%" stroke={battery !== 0 ? (battery > 0 ? "#10b981" : "#6366f1") : "#334155"} strokeWidth="2" strokeDasharray={battery !== 0 ? "5,5" : ""} className={battery !== 0 ? "animate-[dash_1s_linear_infinite]" : ""} />
+        <line x1="70%" y1="50%" x2="50%" y2="50%" stroke={battery !== 0 ? battery > 0 ? "#10b981" : "#6366f1" : "#334155"} strokeWidth="2" strokeDasharray={battery !== 0 ? "5,5" : ""} className={battery !== 0 ? "animate-[dash_1s_linear_infinite]" : ""} />
         {/* Diesel to Bus */}
         <line x1="40%" y1="80%" x2="50%" y2="50%" stroke={diesel > 0 ? "#ef4444" : "#334155"} strokeWidth="2" strokeDasharray={diesel > 0 ? "5,5" : ""} className={diesel > 0 ? "animate-[dash_1s_linear_infinite]" : ""} />
         {/* Bus to Load */}
@@ -38,9 +38,9 @@ function EnergyFlowDiagram({ data, formatPower, mode, simScenario }: { data: any
       {/* Central Bus */}
       <div className={cn(
         "absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface-container px-6 py-4 rounded-xl border-2 z-10 font-bold text-center transition-all",
-        mode === 'SIMULATION'
-          ? "border-amber-500 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.25)]"
-          : "border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+        mode === 'SIMULATION' ?
+        "border-amber-500 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.25)]" :
+        "border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
       )}>
         <div className="text-[10px] tracking-widest text-outline uppercase mb-1">
           {mode === 'SIMULATION' ? 'Testbed Bus' : 'Microgrid Bus'}
@@ -62,9 +62,9 @@ function EnergyFlowDiagram({ data, formatPower, mode, simScenario }: { data: any
           </div>
           <div className="text-lg font-mono font-bold text-on-surface">{formatPower(solar)}</div>
           <div className="text-[10px] mt-1 flex items-center justify-center gap-1 font-medium">
-            <div className={`w-1.5 h-1.5 rounded-full ${solar > 0 ? (mode === 'SIMULATION' && simScenario === 'solar_drop' ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500 animate-pulse') : 'bg-slate-600'}`}></div>
+            <div className={`w-1.5 h-1.5 rounded-full ${solar > 0 ? mode === 'SIMULATION' && simScenario === 'solar_drop' ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500 animate-pulse' : 'bg-slate-600'}`}></div>
             <span className={mode === 'SIMULATION' && simScenario === 'solar_drop' ? "text-amber-400" : "text-emerald-400"}>
-              {mode === 'SIMULATION' && simScenario === 'solar_drop' ? 'Cloud Attenuated (-60%)' : (solar > 0 ? 'Producing' : 'Standby')}
+              {mode === 'SIMULATION' && simScenario === 'solar_drop' ? 'Cloud Attenuated (-60%)' : solar > 0 ? 'Producing' : 'Standby'}
             </span>
           </div>
         </div>
@@ -94,9 +94,9 @@ function EnergyFlowDiagram({ data, formatPower, mode, simScenario }: { data: any
             {battery > 0 ? '+' : ''}{formatPower(battery)}
           </div>
           <div className="text-[10px] text-on-surface-variant mt-1 font-medium">
-            SOC: {mode === 'SIMULATION' && simScenario === 'solar_drop' ? '44.8%' : (mode === 'SIMULATION' && simScenario === 'generator_failure' ? '38.6%' : '66.2%')}{' '}
-            <span className={battery > 0 ? "text-emerald-400" : (battery < 0 ? "text-indigo-400" : "")}>
-              ({battery > 0 ? 'Discharging' : (battery < 0 ? 'Charging' : 'Idle')})
+            SOC: {mode === 'SIMULATION' && simScenario === 'solar_drop' ? '44.8%' : mode === 'SIMULATION' && simScenario === 'generator_failure' ? '38.6%' : '66.2%'}{' '}
+            <span className={battery > 0 ? "text-emerald-400" : battery < 0 ? "text-indigo-400" : ""}>
+              ({battery > 0 ? 'Discharging' : battery < 0 ? 'Charging' : 'Idle'})
             </span>
           </div>
         </div>
@@ -110,9 +110,9 @@ function EnergyFlowDiagram({ data, formatPower, mode, simScenario }: { data: any
           </div>
           <div className="text-lg font-mono font-bold text-on-surface">{formatPower(diesel)}</div>
           <div className="text-[10px] text-outline mt-1 flex items-center justify-center gap-1 font-medium">
-            <div className={`w-1.5 h-1.5 rounded-full ${diesel > 0 ? 'bg-red-500 animate-pulse' : (mode === 'SIMULATION' && simScenario === 'generator_failure' ? 'bg-red-600' : 'bg-slate-600')}`}></div>
+            <div className={`w-1.5 h-1.5 rounded-full ${diesel > 0 ? 'bg-red-500 animate-pulse' : mode === 'SIMULATION' && simScenario === 'generator_failure' ? 'bg-red-600' : 'bg-slate-600'}`}></div>
             <span className={mode === 'SIMULATION' && simScenario === 'generator_failure' ? "text-red-400 font-bold" : ""}>
-              {mode === 'SIMULATION' && simScenario === 'generator_failure' ? 'TRIPPED / 0 kW' : (diesel > 0 ? 'Running' : 'Standby Reserve')}
+              {mode === 'SIMULATION' && simScenario === 'generator_failure' ? 'TRIPPED / 0 kW' : diesel > 0 ? 'Running' : 'Standby Reserve'}
             </span>
           </div>
         </div>
@@ -126,27 +126,27 @@ function EnergyFlowDiagram({ data, formatPower, mode, simScenario }: { data: any
           </div>
           <div className="text-lg font-mono font-bold text-on-surface">{formatPower(load)}</div>
           <div className="text-[10px] text-on-surface-variant mt-1 font-medium">
-            {mode === 'SIMULATION' && simScenario === 'demand_spike' ? (
-              <span className="text-amber-400 font-bold">Surge Peak (+35%) Active</span>
-            ) : (
-              'Village & Commercial load'
-            )}
+            {mode === 'SIMULATION' && simScenario === 'demand_spike' ?
+            <span className="text-amber-400 font-bold">Surge Peak (+35%) Active</span> :
+
+            'Village & Commercial load'
+            }
           </div>
         </div>
       </div>
       
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{ __html: `
         @keyframes dash {
           to {
             stroke-dashoffset: -10;
           }
         }
-      `}} />
-    </div>
-  );
+      ` }} />
+    </div>);
+
 }
 
-function KpiCard({ title, value, subValue, icon: Icon, colorClass, highlight }: any) {
+function KpiCard({ title, value, subValue, icon: Icon, colorClass, highlight }) {
   return (
     <Card className="bg-surface/80 border-outline-variant hover:bg-surface-container/80 transition-colors">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -160,18 +160,18 @@ function KpiCard({ title, value, subValue, icon: Icon, colorClass, highlight }: 
           {subValue}
         </p>
       </CardContent>
-    </Card>
-  );
+    </Card>);
+
 }
 
 export default function OverviewPage() {
   const router = useRouter();
-  const { 
+  const {
     currency, powerScale, formatCurrency, formatPower, locationId,
     mode, simScenario, setMode, setSimScenario
   } = useSettings();
-  
-  const currentLoc = LOCATIONS.find(l => l.id === locationId);
+
+  const currentLoc = LOCATIONS.find((l) => l.id === locationId);
   const locScale = currentLoc ? currentLoc.scale : 1.0;
   const locName = currentLoc ? currentLoc.name.split(' (')[0] : 'Microgrid';
 
@@ -184,7 +184,7 @@ export default function OverviewPage() {
     load: 194.0
   });
 
-  const [graphData, setGraphData] = useState<any[]>([]);
+  const [graphData, setGraphData] = useState([]);
 
   useEffect(() => {
     // Determine baseline numbers depending on mode and simScenario
@@ -226,29 +226,29 @@ export default function OverviewPage() {
     // Generate initial 24h graph data
     const initial = [];
     const now = new Date();
-    for(let i = 24; i >= 0; i--) {
+    for (let i = 24; i >= 0; i--) {
       const d = new Date(now.getTime() - i * 60 * 60 * 1000);
       const hour = d.getHours();
-      
+
       let s = 0;
       if (hour > 6 && hour < 19) {
-        const peak = (mode === 'SIMULATION' && simScenario === 'solar_drop') ? 45 : 150;
+        const peak = mode === 'SIMULATION' && simScenario === 'solar_drop' ? 45 : 150;
         s = Math.sin((hour - 6) / 13 * Math.PI) * peak;
       }
-      
-      const bLoad = (mode === 'SIMULATION' && simScenario === 'demand_spike') ? 120 : 80;
+
+      const bLoad = mode === 'SIMULATION' && simScenario === 'demand_spike' ? 120 : 80;
       const morningPeak = hour >= 7 && hour <= 10 ? 40 : 0;
-      const eveningPeak = hour >= 18 && hour <= 22 ? ((mode === 'SIMULATION' && simScenario === 'demand_spike') ? 95 : 60) : 0;
+      const eveningPeak = hour >= 18 && hour <= 22 ? mode === 'SIMULATION' && simScenario === 'demand_spike' ? 95 : 60 : 0;
       const l = bLoad + morningPeak + eveningPeak + Math.random() * 10;
       const w = 20 + Math.random() * 30;
-      
-      const dieselOut = (mode === 'SIMULATION' && simScenario === 'generator_failure') ? 0 : (s + w < l ? Math.min(30, l - (s + w)) : 0);
+
+      const dieselOut = mode === 'SIMULATION' && simScenario === 'generator_failure' ? 0 : s + w < l ? Math.min(30, l - (s + w)) : 0;
 
       initial.push({
         time: `${hour.toString().padStart(2, '0')}:00`,
         Solar: Math.max(0, s) * locScale,
         Wind: w * locScale,
-        Diesel: dieselOut * (2 - locScale),
+        Diesel: dieselOut * (2 - locScale)
       });
     }
     setGraphData(initial);
@@ -264,9 +264,9 @@ export default function OverviewPage() {
 
     // Live ticker
     const interval = setInterval(() => {
-      setLiveData(prev => {
-        const jitterWind = (Math.random() * 6 - 3);
-        const jitterLoad = (Math.random() * 6 - 3);
+      setLiveData((prev) => {
+        const jitterWind = Math.random() * 6 - 3;
+        const jitterLoad = Math.random() * 6 - 3;
         const newWind = Math.max(0, prev.wind + jitterWind);
         const newLoad = Math.max(50, prev.load + jitterLoad);
         let newDiesel = prev.diesel;
@@ -274,7 +274,7 @@ export default function OverviewPage() {
           newDiesel = 0;
         }
         const newBatt = newLoad - newWind - prev.solar - newDiesel;
-        
+
         return {
           ...prev,
           wind: Math.round(newWind * 10) / 10,
@@ -283,30 +283,30 @@ export default function OverviewPage() {
           battery: Math.round(newBatt * 10) / 10
         };
       });
-      
-      setGraphData(current => {
+
+      setGraphData((current) => {
         const newArr = [...current];
         const last = { ...newArr[newArr.length - 1] };
         last.Wind = liveData.wind;
         newArr[newArr.length - 1] = last;
         return newArr;
       });
-      
+
     }, 2500);
 
     return () => clearInterval(interval);
   }, [locScale, mode, simScenario]);
 
   // Compute reactive KPI figures
-  const renShare = mode === 'SIMULATION' && simScenario === 'solar_drop' 
-    ? '38.2%' 
-    : (mode === 'SIMULATION' && simScenario === 'generator_failure' ? '100.0%' : '76.4%');
-  const dieselDep = mode === 'SIMULATION' && simScenario === 'solar_drop' 
-    ? '23.2%' 
-    : (mode === 'SIMULATION' && simScenario === 'demand_spike' ? '10.9%' : '0%');
-  const battSoc = mode === 'SIMULATION' && simScenario === 'solar_drop' 
-    ? '44.8%' 
-    : (mode === 'SIMULATION' && simScenario === 'generator_failure' ? '38.6%' : '66.2%');
+  const renShare = mode === 'SIMULATION' && simScenario === 'solar_drop' ?
+  '38.2%' :
+  mode === 'SIMULATION' && simScenario === 'generator_failure' ? '100.0%' : '76.4%';
+  const dieselDep = mode === 'SIMULATION' && simScenario === 'solar_drop' ?
+  '23.2%' :
+  mode === 'SIMULATION' && simScenario === 'demand_spike' ? '10.9%' : '0%';
+  const battSoc = mode === 'SIMULATION' && simScenario === 'solar_drop' ?
+  '44.8%' :
+  mode === 'SIMULATION' && simScenario === 'generator_failure' ? '38.6%' : '66.2%';
 
   return (
     <div className="space-y-6 pb-12">
@@ -318,9 +318,9 @@ export default function OverviewPage() {
             Executive Overview 
             <span className={cn(
               "text-[10px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider",
-              mode === 'SIMULATION'
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/30"
-                : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+              mode === 'SIMULATION' ?
+              "bg-amber-500/20 text-amber-300 border-amber-500/30" :
+              "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
             )}>
               {locName} • {mode === 'SIMULATION' ? 'SIMULATION' : 'LIVE SCADA'}
             </span>
@@ -329,24 +329,24 @@ export default function OverviewPage() {
         </div>
         
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => router.push('/optimizer')}
-            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-md shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
-          >
+            className="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-md shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2">
+            
             <Activity size={14} /> Launch Optimizer
           </button>
-          <button 
+          <button
             onClick={() => router.push('/demand')}
-            className="px-4 py-2 bg-surface-container hover:bg-slate-700 text-on-surface border border-outline font-bold text-xs rounded-md transition-all flex items-center gap-2"
-          >
+            className="px-4 py-2 bg-surface-container hover:bg-slate-700 text-on-surface border border-outline font-bold text-xs rounded-md transition-all flex items-center gap-2">
+            
             <Zap size={14} /> Fuel & Demand
           </button>
         </div>
       </div>
 
       {/* Simulation Notice Banner */}
-      {mode === 'SIMULATION' && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3.5 flex items-center justify-between text-xs text-amber-200 animate-in fade-in">
+      {mode === 'SIMULATION' &&
+      <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3.5 flex items-center justify-between text-xs text-amber-200 animate-in fade-in">
           <div className="flex items-center gap-2.5">
             <FlaskConical size={18} className="text-amber-400 shrink-0 animate-pulse" />
             <div>
@@ -360,32 +360,32 @@ export default function OverviewPage() {
             </div>
           </div>
           <button
-            onClick={() => setMode('LIVE')}
-            className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded text-amber-300 font-semibold shrink-0 ml-4 transition-colors"
-          >
+          onClick={() => setMode('LIVE')}
+          className="px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 rounded text-amber-300 font-semibold shrink-0 ml-4 transition-colors">
+          
             Restore Live SCADA
           </button>
         </div>
-      )}
+      }
 
       {/* KPIs */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        <KpiCard 
-          title="Renewable Share" 
-          value={renShare} 
-          subValue={mode === 'SIMULATION' ? "Simulated Mix" : "+4.2% vs yesterday"} 
-          icon={Leaf} 
-          colorClass={mode === 'SIMULATION' && simScenario === 'solar_drop' ? "text-amber-400" : "text-emerald-500"} 
-          highlight={mode === 'LIVE'} 
-        />
-        <KpiCard 
-          title="Diesel Dependency" 
-          value={dieselDep} 
-          subValue={mode === 'SIMULATION' && simScenario === 'solar_drop' ? "Reserve Fired (+23%)" : (mode === 'SIMULATION' && simScenario === 'generator_failure' ? "Genset Tripped" : "-8.1% vs baseline")} 
-          icon={Droplet} 
-          colorClass={dieselDep === '0%' ? "text-emerald-500" : "text-red-500"} 
-          highlight={dieselDep === '0%'} 
-        />
+        <KpiCard
+          title="Renewable Share"
+          value={renShare}
+          subValue={mode === 'SIMULATION' ? "Simulated Mix" : "+4.2% vs yesterday"}
+          icon={Leaf}
+          colorClass={mode === 'SIMULATION' && simScenario === 'solar_drop' ? "text-amber-400" : "text-emerald-500"}
+          highlight={mode === 'LIVE'} />
+        
+        <KpiCard
+          title="Diesel Dependency"
+          value={dieselDep}
+          subValue={mode === 'SIMULATION' && simScenario === 'solar_drop' ? "Reserve Fired (+23%)" : mode === 'SIMULATION' && simScenario === 'generator_failure' ? "Genset Tripped" : "-8.1% vs baseline"}
+          icon={Droplet}
+          colorClass={dieselDep === '0%' ? "text-emerald-500" : "text-red-500"}
+          highlight={dieselDep === '0%'} />
+        
         <KpiCard title="Current Load" value={formatPower(liveData.load)} subValue={`Peak: ${formatPower(mode === 'SIMULATION' && simScenario === 'demand_spike' ? 285 : 184)}`} icon={Zap} colorClass="text-yellow-500" />
         <KpiCard title="Battery SOC" value={battSoc} subValue={mode === 'SIMULATION' && (simScenario === 'solar_drop' || simScenario === 'generator_failure') ? "Rapid Discharging" : "330.9 kWh avail"} icon={Battery} colorClass="text-indigo-500" />
         <KpiCard title="Operating Cost" value={formatCurrency(mode === 'SIMULATION' && simScenario === 'solar_drop' ? 124000 : 88459)} subValue={mode === 'SIMULATION' ? "Scenario Rate" : `Save ${formatCurrency(29310)}`} icon={CircleDollarSign} colorClass="text-emerald-500" highlight={mode === 'LIVE'} />
@@ -400,9 +400,9 @@ export default function OverviewPage() {
               {mode === 'SIMULATION' ? 'Simulation Bus Telemetry' : 'Live Microgrid Bus & Power Flow'}
               <span className={cn(
                 "text-[10px] px-1.5 py-0.5 rounded border tracking-wider uppercase font-semibold",
-                mode === 'SIMULATION'
-                  ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                  : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                mode === 'SIMULATION' ?
+                "bg-amber-500/15 text-amber-300 border-amber-500/30" :
+                "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
               )}>
                 {mode === 'SIMULATION' ? `TESTBED • ${simScenario.toUpperCase()}` : 'SYNCED 50.02 Hz'}
               </span>
@@ -449,25 +449,25 @@ export default function OverviewPage() {
               <AreaChart data={graphData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorSolar" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#fbbf24" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#fbbf24" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#fbbf24" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorWind" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#60a5fa" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorDiesel" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f87171" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#f87171" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#f87171" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#f87171" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="time" stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} />
                 <YAxis stroke="#64748b" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(val) => formatPower(val)} />
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
-                <RechartsTooltip 
+                <RechartsTooltip
                   contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '8px', fontSize: '12px' }}
-                  itemStyle={{ fontWeight: 'bold' }}
-                />
+                  itemStyle={{ fontWeight: 'bold' }} />
+                
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 'bold' }} />
                 <Area type="monotone" dataKey="Diesel" stroke="#f87171" fillOpacity={1} fill="url(#colorDiesel)" />
                 <Area type="monotone" dataKey="Solar" stroke="#fbbf24" fillOpacity={1} fill="url(#colorSolar)" />
@@ -508,15 +508,15 @@ export default function OverviewPage() {
               </ul>
             </div>
 
-            <button 
+            <button
               onClick={() => router.push('/optimizer')}
-              className="mt-6 w-full py-2.5 bg-surface-container hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-outline transition-colors"
-            >
+              className="mt-6 w-full py-2.5 bg-surface-container hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-outline transition-colors">
+              
               Review LP Mathematical Formulation →
             </button>
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>);
+
 }

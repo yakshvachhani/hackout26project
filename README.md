@@ -1,97 +1,218 @@
-# ⚡ OptiGrid-AI
+⭐ ENERFLUX
+📌 Project Overview
+ENERFLUX is an intelligent Microgrid SCADA dashboard and Linear Programming (LP) optimization platform. 
+The system simulates how a smart microgrid manages various power sources (Solar, Wind, Battery Energy Storage, and Diesel Generators) to serve community loads efficiently.
+This project demonstrates key microgrid management concepts including:
+- Real-Time SCADA Telemetry
+- Renewable Energy Forecasting
+- Battery Energy Storage System (BESS) Management
+- Diesel Generator Dispatch
+- Cost and Carbon Optimization
+- Live Weather Data Integration
 
-> **An Intelligent Grid Management and Optimization Platform**  
-> *Built for HackOut'26 at DA-IICT*
+The goal of this project is to showcase how AI and mathematical optimization can reduce costs and minimize carbon emissions in off-grid or rural networks. 
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)](https://reactjs.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python)](https://python.org/)
-[![PuLP](https://img.shields.io/badge/PuLP-Optimization-orange?style=for-the-badge)](#)
+This project is suitable for:
+- Academic demonstrations in renewable energy
+- Hackathon submissions (Built for HackOut'26)
+- Energy optimization learning
+- Full-stack system design practice
 
----
+🎯 Project Objective
+The main objective of this project is to demonstrate how intelligent software can autonomously dispatch energy resources in an off-grid network. 
+The project shows the complete lifecycle of grid optimization:
+Weather Forecast → Solar/Wind Estimation → Load Demand Analysis → Linear Programming Optimization → Asset Dispatch → Cost/CO2 Reporting
 
-## 📖 The Problem
-Rural and remote communities in India often rely on expensive, highly polluting diesel generators or experience frequent grid outages. While renewable energy (solar/wind) combined with Battery Energy Storage Systems (BESS) provides a clean alternative, calculating the *exact moment* to dispatch power, store energy, or run a backup generator is an incredibly complex mathematical problem. Volatile weather, fluctuating community demand, and battery degradation make manual dispatching highly inefficient and costly.
+The system highlights how this platform improves:
+- Energy cost reduction
+- Carbon footprint minimization
+- Battery health preservation
+- Grid reliability and operational efficiency
 
-## 💡 Our Solution
-**OptiGrid-AI** is an enterprise-grade Microgrid SCADA dashboard and Linear Programming (LP) optimizer designed to intelligently dispatch energy resources in off-grid rural networks. By analyzing weather forecasts, real-time load demand, and battery state-of-charge, OptiGrid-AI dictates the most cost-effective and carbon-neutral energy mix.
+🛠 Technology Stack
+Frontend
+- React (Next.js)
+- TailwindCSS
+- Recharts (for telemetry graphs)
+- Axios
 
----
+Backend
+- Python
+- FastAPI
+- PuLP (Mathematical Optimization Engine)
+- Uvicorn
 
-## 🧠 Technical Approach
+Architecture
+- REST API Architecture
+- Decoupled Frontend and Backend Applications
+- Mathematical Optimization Layer
 
-### 1. Mathematical Optimization Engine (Linear Programming)
-At the core of the backend is a highly sophisticated dispatch algorithm built using Python's **PuLP** library. 
-- **Objective Function:** The algorithm mathematically minimizes total operating costs and CO₂ emissions.
-- **Constraints:** It balances the grid equation (`Solar + Wind + Battery_Discharge + Diesel = Load + Battery_Charge`) at every time interval.
-- **Battery Health Preservation:** The algorithm strictly enforces State-of-Charge (SOC) constraints (keeping batteries between 20% and 95%) to prevent deep discharge degradation.
+🏗 System Architecture
+The application follows a modular full-stack architecture. 
+The backend provides high-performance REST APIs powered by FastAPI and PuLP, and the Next.js frontend consumes these APIs to display live telemetry and manage grid settings. 
+This architecture ensures:
+- Real-time data processing
+- Scalability
+- Clean code organization
+- Separation of concerns
 
-### 2. Live SCADA Telemetry & Dynamic Scaling
-The Next.js frontend acts as a Supervisory Control and Data Acquisition (SCADA) system. It features an interactive, animated SVG transmission diagram.
-The platform dynamically scales energy profiles based on geographic selection. If a user switches from the **Kutch Desert Hub** to the **Spiti Valley Microgrid**, the system instantly pulls that region's unique metadata, adjusts temperature scales, modifies solar irradiance multipliers, and redraws the UI telemetry in real-time.
+📂 Project Folder Structure
+backend/
+  routers/
+  services/
+  models/
+  main.py
+frontend/
+  src/
+    app/
+    components/
+    contexts/
+    lib/
+optimization/
+data/
 
-### 3. Predictive Weather Risk Integration
-OptiGrid-AI connects to the **Open-Meteo API** to pull live 48-hour forecasts for the exact GPS coordinates of the selected microgrid. It correlates cloud cover percentages with expected solar drops and issues preemptive AI recommendations (e.g., *"Trigger battery charging cycle before 14:00 today due to expected cloud cover"*).
+👤 User Roles
+The system simplifies grid access into three major roles.
 
----
+🧑💼 Grid Operator
+The Grid Operator handles operational activities related to dispatching and monitoring.
+Responsibilities
+- Monitor live SCADA telemetry
+- Override automated dispatch (e.g., force start diesel generator)
+- Check battery state of charge (SOC)
+- Monitor weather warnings and alerts
+Modules Accessible
+- Alerts
+- Assets
+- Battery
+- Demand
+- Dispatch
+- Weather
 
-## ✨ Key Features
-- 📊 **Real-Time Dashboards:** Track "Renewable Share", "Diesel Dependency", and "CO₂ Avoided" metrics.
-- ⚙️ **Mathematical Dispatch Breakdown:** Dedicated Optimizer page showing exactly how the LP algorithm arrived at its conclusions.
-- 🌍 **Multi-Region Support:** Hot-swap between diverse Indian microgrids instantly.
-- 📑 **Auditor PDF Export:** Clean, printable, optimized PDF reports removing dashboard UI elements for compliance auditing.
+💰 Financial Auditor
+The Financial Auditor manages financial metrics and energy market pricing.
+Responsibilities
+- Monitor daily and monthly energy costs
+- Track diesel fuel expenses based on localized pricing
+- Generate cost vs. savings reports
+- Evaluate carbon credits (CO₂ Avoided)
+Modules Accessible
+- Analytics
+- Cost
+- Reports
 
----
+🛡 System Administrator
+The Admin has full system access to configure the underlying AI models.
+Responsibilities
+- Access all modules
+- Adjust optimization scenarios and constraints
+- Modify fuel prices and grid parameters
+- Hot-swap geographic microgrid profiles (e.g., Kutch Desert vs Spiti Valley)
 
-## 📂 Repository Structure
+🔄 Core Optimization Workflow
+The system demonstrates the complete lifecycle of a smart microgrid decision.
 
-```text
-OptiGrid-AI/
-├── frontend/        # Next.js Web dashboard, SCADA UI, and global state
-├── backend/         # FastAPI Server, REST endpoints, and API integrations
-├── optimization/    # PuLP Linear Programming models & grid algorithms
-└── data/            # Simulated SCADA datasets and historical telemetry
-```
+Step 1 – Data Ingestion
+System pulls live weather forecasts (Open-Meteo) and real-time load demand.
+Step 2 – Generation Estimation
+Calculates expected Solar and Wind output based on irradiance and wind speed.
+Step 3 – Battery Health Check
+System checks the current State of Charge (SOC) of the Battery Energy Storage System.
+Step 4 – Mathematical Optimization
+PuLP Linear Programming engine calculates the most cost-effective dispatch strategy, balancing the grid equation.
+Step 5 – Dispatch Execution
+Automated signals are generated to charge/discharge the battery or start the diesel generator.
+Step 6 – SCADA Update
+Frontend animated transmission diagrams update to reflect live power flows.
+Step 7 – Cost Calculation
+Financial metrics are updated using localized fuel prices.
+Step 8 – Alert Generation
+AI generates preemptive alerts for operators (e.g., expected cloud cover, high load anomalies).
 
----
+🧩 Major Modules
+SCADA & Telemetry Module
+Displays animated, real-time power flows between assets.
+Optimization Module
+Showcases the linear programming breakdown and algorithm decisions.
+Settings & Configuration Module
+Manages geographic microgrid profiles and live local diesel pricing.
+Weather & Forecasting Module
+Integrates 48-hour environmental data to predict solar output.
+Cost & Analytics Module
+Tracks "Renewable Share", "Diesel Dependency", and "CO₂ Avoided" metrics.
+Alerts Module
+Dynamic alert generation based on live data anomalies and optimization events.
 
-## 🚀 How to Run Locally
+📊 Dashboard Design
+Grid Operator Dashboard
+Displays:
+- Live Power Flows (kW)
+- Battery SOC (%)
+- Renewable Share
+- Weather Alerts
+Financial Dashboard
+Displays:
+- Total Operating Cost
+- Diesel Expenses
+- Estimated Savings vs Baseline
+- CO₂ Emissions Avoided
 
-### 1. Start the Backend (Python/FastAPI)
-```bash
+🚀 Installation Guide
+Clone the Repository
+To get a local copy of the project, clone the repository from GitHub and navigate into the project directory.
+git clone https://github.com/yakshvachhanis/hackout26_project.git
+cd hackout26_project
+
+Backend Setup
 cd backend
 python -m venv venv
 # Windows: venv\Scripts\activate
 # Mac/Linux: source venv/bin/activate
 pip install fastapi uvicorn pulp pandas
 python -m uvicorn main:app --reload --port 8000
-```
 
-### 2. Start the Frontend (Next.js/React)
-```bash
+Frontend Setup
 cd frontend
 npm install
 npm run dev
-```
 
-### 3. View the App
-Open `http://localhost:3000` in your browser.
+View the App
+Open http://localhost:3000 in your browser.
 
----
+📸 Screenshots
 
-## 👥 The Team
-Built with ❤️ by a team of 4 for **HackOut'26**:
+### Homepage / Live SCADA
+![Live SCADA Executive Overview](./docs/scada.png)
 
-| Name | Role / GitHub |
-| :--- | :--- |
-| **Daksh Kevadiya** | [GitHub Profile](https://github.com/dakshkevadiya) |
-| **Yaksh Vachhani** | [GitHub Profile](https://github.com/yakshvachhanis) |
-| **Pal Patel** | [GitHub Profile](https://github.com/pal0611) |
-| **Dhruvi Ambaliya** | [GitHub Profile](https://github.com/dhruvi544) |
+### Optimizer Breakdown
+![AI Grid Optimizer Breakdown](./docs/optimizer.png)
 
----
+### Cost Analytics
+![Cost and Carbon Emissions](./docs/cost.png)
 
-## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Weather Integration
+![Renewable Generation Forecast](./docs/weather.png)
+
+👨💻 Team Members
+Daksh Kevadiya - GitHub Profile: https://github.com/dakshkevadiya
+Yaksh Vachhani - GitHub Profile: https://github.com/yakshvachhanis
+Pal Patel - GitHub Profile: https://github.com/pal0611
+Dhruvi Ambaliya - GitHub Profile: https://github.com/dhruvi544
+
+🎓 Project Usage
+This project can be used for:
+- Microgrid dispatch demonstrations
+- Hackathon projects
+- Software engineering learning
+- Applied linear programming practice
+
+🔮 Future Improvements
+Possible future enhancements include:
+- Real-time IoT sensor integration (Modbus/MQTT)
+- AI-based deep learning demand forecasting
+- Advanced multi-node grid topologies
+- Cloud deployment (AWS/GCP)
+- Mobile application support
+
+📄 License
+This project is developed for HackOut'26 and educational purposes. See the LICENSE file for details.

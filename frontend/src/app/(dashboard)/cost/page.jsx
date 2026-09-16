@@ -4,34 +4,34 @@ import React, { useState, useEffect } from 'react';
 import { useSettings } from '@/contexts/SettingsContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CircleDollarSign, CloudRain, Droplet, Battery, TrendingDown, Leaf } from 'lucide-react';
-import { 
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area, Cell
-} from 'recharts';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area, Cell } from
+'recharts';
 
 export default function CostPage() {
   const { currency, powerScale } = useSettings();
-  const [weeklyData, setWeeklyData] = useState<any[]>([]);
-  
+  const [weeklyData, setWeeklyData] = useState([]);
+
   useEffect(() => {
-    fetch('http://localhost:8000/api/cost')
-      .then(res => res.json())
-      .then(data => setWeeklyData(data))
-      .catch(err => console.error(err));
+    fetch('http://localhost:8000/api/cost').
+    then((res) => res.json()).
+    then((data) => setWeeklyData(data)).
+    catch((err) => console.error(err));
   }, []);
 
   // Dynamic KPIs
   const todaysCost = weeklyData.length ? weeklyData[weeklyData.length - 1].optimizedCost : 0;
   const todaysBaseline = weeklyData.length ? weeklyData[weeklyData.length - 1].dieselOnlyCost : 0;
-  const savingsPercent = todaysBaseline ? Math.round(((todaysBaseline - todaysCost) / todaysBaseline) * 100) : 0;
+  const savingsPercent = todaysBaseline ? Math.round((todaysBaseline - todaysCost) / todaysBaseline * 100) : 0;
   const totalCO2 = weeklyData.reduce((acc, curr) => acc + curr.savedCO2, 0).toFixed(0);
   const totalSavings = weeklyData.reduce((acc, curr) => acc + (curr.dieselOnlyCost - curr.optimizedCost), 0).toFixed(0);
 
   const costBreakdown = [
-    { name: 'Diesel Fuel', cost: 1840, fill: '#f87171' },
-    { name: 'Battery Degradation', cost: 650, fill: '#818cf8' },
-    { name: 'O&M Renewables', cost: 350, fill: '#10b981' },
-    { name: 'Carbon Penalty', cost: 400, fill: '#94a3b8' },
-  ];
+  { name: 'Diesel Fuel', cost: 1840, fill: '#f87171' },
+  { name: 'Battery Degradation', cost: 650, fill: '#818cf8' },
+  { name: 'O&M Renewables', cost: 350, fill: '#10b981' },
+  { name: 'Carbon Penalty', cost: 400, fill: '#94a3b8' }];
+
 
   return (
     <div className="space-y-6">
@@ -105,7 +105,7 @@ export default function CostPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
                   <XAxis dataKey="day" stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" tickFormatter={(val) => `${currency}${val}`} />
-                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} formatter={(val: any) => `${currency}${val}`} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} formatter={(val) => `${currency}${val}`} />
                   <Legend />
                   <Bar dataKey="dieselOnlyCost" fill="#cbd5e1" name="Diesel-Only Baseline" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="optimizedCost" fill="#10b981" name="Optimized Microgrid" radius={[4, 4, 0, 0]} />
@@ -126,8 +126,8 @@ export default function CostPage() {
                 <AreaChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorCO2" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
@@ -154,12 +154,12 @@ export default function CostPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" horizontal={false} />
                   <XAxis type="number" stroke="#94a3b8" tickFormatter={(val) => `${currency}${val}`} />
                   <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} />
-                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} cursor={{fill: '#e2e8f0'}} formatter={(val: any) => `${currency}${val}`} />
+                  <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', color: '#0f172a' }} cursor={{ fill: '#e2e8f0' }} formatter={(val) => `${currency}${val}`} />
                   <Bar dataKey="cost" radius={[0, 4, 4, 0]}>
                     {
-                      costBreakdown.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))
+                    costBreakdown.map((entry, index) =>
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                    )
                     }
                   </Bar>
                 </BarChart>
@@ -169,7 +169,6 @@ export default function CostPage() {
         </Card>
 
       </div>
-    </div>
-  );
-}
+    </div>);
 
+}
