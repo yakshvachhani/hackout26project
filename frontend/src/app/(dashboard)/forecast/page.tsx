@@ -90,8 +90,9 @@ export default function ForecastPage() {
   // Prepare filtered data based on horizon
   const displayData = data.slice(0, horizon + 1);
 
-  // Get operational blocks (0, 6, 12, 24, 36, 48)
-  const opBlocks = [0, 6, 12, 24, 36, 48].map(offset => data[offset]).filter(Boolean);
+  // Get operational blocks based on horizon (24h: 0, 4, 8, 12, 18, 24; 48h: 0, 6, 12, 24, 36, 48)
+  const offsets = horizon === 24 ? [0, 4, 8, 12, 18, 24] : [0, 6, 12, 24, 36, 48];
+  const opBlocks = offsets.map(offset => data[offset]).filter(Boolean);
 
   return (
     <div className="space-y-6 pb-12">
@@ -104,7 +105,7 @@ export default function ForecastPage() {
               Open-Meteo Free API
             </span>
           </h2>
-          <p className="text-outline text-sm mt-1">Physics-grounded PV irradiation models, anemometer wind curves, and 48-hour planning horizons</p>
+          <p className="text-outline text-sm mt-1">Physics-grounded PV irradiation models, anemometer wind curves, and {horizon}-hour planning horizons</p>
         </div>
         
         <div className="flex bg-surface rounded-md border border-outline p-1">
@@ -127,8 +128,8 @@ export default function ForecastPage() {
       <Card className="bg-surface/50 border-outline-variant">
         <CardHeader className="pb-3 border-b border-outline-variant flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-bold flex items-center gap-2 text-on-surface uppercase tracking-wider">
-            <Calendar size={16} className="text-emerald-500" />
-            48-Hour Operational Timeline & Risk Detection
+            <Calendar size={16} className={horizon === 24 ? "text-emerald-500" : "text-blue-400"} />
+            {horizon}-Hour Operational Timeline & Risk Detection
           </CardTitle>
           <div className="text-[11px] text-outline font-mono">Location: Dhordo, Gujarat (23.83°N, 69.85°E)</div>
         </CardHeader>

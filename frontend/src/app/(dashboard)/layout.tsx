@@ -62,16 +62,36 @@ function LiveWeatherWidget() {
     fetch('http://localhost:8000/api/weather')
       .then(res => res.json())
       .then(data => {
-        if(data && data.date && data.date.length > 0) {
-           setWeather({ 
-             temp: data.temperature[0] + tempOffset, 
-             rad: data.solar_radiation[0] * solarScale 
-           });
+        if (data) {
+          let rad = data.current_solar_radiation;
+          let temp = data.current_temperature;
+
+          if (rad === undefined && data.data?.current_solar_radiation !== undefined) {
+            rad = data.data.current_solar_radiation;
+            temp = data.data.current_temperature;
+          }
+
+          if (rad === undefined && data.date && data.solar_radiation && data.date.length > 0) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            let idx = data.date.findIndex((dStr: string) => new Date(dStr).getHours() === currentHour);
+            if (idx === -1) idx = 0;
+            rad = data.solar_radiation[idx];
+            temp = data.temperature ? data.temperature[idx] : 25;
+          }
+
+          const finalRad = typeof rad === 'number' ? rad : 162.6;
+          const finalTemp = typeof temp === 'number' ? temp : 28.6;
+
+          setWeather({ 
+            temp: finalTemp + tempOffset, 
+            rad: finalRad * solarScale 
+          });
         }
       })
       .catch(err => {
         console.error("Weather fetch failed", err);
-        setWeather({ temp: 28.6 + tempOffset, rad: 800 * solarScale });
+        setWeather({ temp: 28.6 + tempOffset, rad: 450 * solarScale });
       });
   }, [locationId]);
 

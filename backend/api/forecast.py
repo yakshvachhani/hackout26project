@@ -30,6 +30,10 @@ async def get_weather(
             latitude=lat,
             longitude=lon
         )
+        snap = _weather_manager.get_current_weather(latitude=lat, longitude=lon)
+        current_rad = round(snap.solar_irradiance_wm2, 1)
+        current_temp = round(snap.temperature_c, 1)
+        current_wind = round(snap.wind_speed_ms, 1)
         dates = [w.timestamp for w in series.intervals]
         temps = [round(w.temperature_c, 1) for w in series.intervals]
         rads = [round(w.solar_irradiance_wm2, 1) for w in series.intervals]
@@ -39,6 +43,9 @@ async def get_weather(
         import math, random
         from datetime import datetime, timedelta, timezone
         now = datetime.now(timezone.utc)
+        current_temp = 28.5
+        current_rad = 420.0
+        current_wind = 12.5
         dates, temps, rads, winds, clouds = [], [], [], [], []
         for i in range(days * 24):
             dt = now + timedelta(hours=i)
@@ -52,12 +59,18 @@ async def get_weather(
 
     return {
         "status": "success",
+        "current_temperature": current_temp,
+        "current_solar_radiation": current_rad,
+        "current_wind_speed": current_wind,
         "date": dates,
         "temperature": temps,
         "solar_radiation": rads,
         "wind_speed": winds,
         "cloud_cover": clouds,
         "data": {
+            "current_temperature": current_temp,
+            "current_solar_radiation": current_rad,
+            "current_wind_speed": current_wind,
             "date": dates,
             "temperature": temps,
             "solar_radiation": rads,
